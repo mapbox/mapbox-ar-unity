@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: player-01 - default
+  m_Shader: {fileID: 4800000, guid: 8de45c360a2d542f4be2d61da2beba10, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _2DReflect:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BRDFTex:
+        m_Texture: {fileID: 2800000, guid: 1af25611ceea0a74a9a88e8b3289738e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 2800000, guid: 22c4cf005fa3c2e4784103319589fecf, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Cube:
+        m_Texture: {fileID: 8900000, guid: b66d7d28b3db14f7382a2887575a3439, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Illum:
+        m_Texture: {fileID: 2800000, guid: 1f1714396b92b4bb2a5af74c57cb57f6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 15e8834927ec3e445a626ae399fd97db, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal:
+        m_Texture: {fileID: 2800000, guid: 22c4cf005fa3c2e4784103319589fecf, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _EmissionLM: 50
+    - _NonLightmapColorMod: 0.43283582
+    - _RoomReflectionAmount: 2.925373
+    - _SelfIllumStrength: 1.5
+    - _SelfIllumination: 1.7164179
+    - _Shininess: 47.837315
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _LightColor: {r: 0.43304664, g: 0.6238685, b: 0.6262335, a: 1}
+    - _LightDir: {r: -0.20423652, g: -0.5517981, b: -0.80858296, a: 0}
+    - _SpecColor: {r: 0.9998989, g: 1, b: 0.99984187, a: 1}
+    - _SpecularColor: {r: 0.8, g: 0.8, b: 0.8, a: 0.8}
+    - _TintColor: {r: 0.999903, g: 1, b: 0.99983, a: 1}
+--- !u!1002 &2100001
+EditorExtensionImpl:
+  serializedVersion: 6
