@@ -1,0 +1,34 @@
+Unity-ARKit-Plugin Step by Step
+
+1. Read up on ARKit and how it works at a high level (https://developer.apple.com/documentation/arkit/understanding_augmented_reality).  This plugin provides the scripting API which corresponds to the ARKit native interface, and then builds on it by creating some GameObject components that use that interface.
+
+2. Please reference our example scene in this project to see how we built up the ARKit example app that is provided.  UnityARSessionNativeInterface.cs and the NativeInterface folder has the lowest level API.  See below for details.
+
+3. Obtain a AR native session interface using UnityARSessionNativeInterface.GetARSessionNativeInterface().  Let's call this m_session in this tutorial. (See UnityARCameraManager.cs)
+
+4. Create an ARSession by calling m_session.RunWithConfig(config), where config will be either an ARKitWorldTrackingSessionConfiguration (6DOF) or ARKitSessionConfiguration (3DOF) with the corresponding parameters set to determine what kind of session you want.  You may also initialize with m_session.RunWithConfigAndOption(config, option), where option allow you to reset the session if one has been started previously. (See UnityARCameraManager.cs))
+
+5. Every update, use m_session.GetCameraPose() to get the ARKit understanding of the camera position and rotation.  Use utility functions that change coordinate systems to determine what the postion and rotation of the camera in the Unity scene should be. e.g. camera.transform.localPosition = UnityARMatrixOps.GetPosition(matrix); camera.transform.localRotation = UnityARMatrixOps.GetRotation (matrix);  (See UnityARCameraManager.cs)
+
+6. Every update, use m_session.GetCameraProjection () to get the  ARKit understanding of the camera projection parameters and use camera.projectionMatrix to set it on the Unity camera (See UnityARCameraManager.cs)
+
+7. On the main camera for the scene, add the UnityARVideo MonoBehaviour component, and set the clear material in the inspector to point to the YUVMaterial in the project. You can look in the source at what this does:  every frame, it takes the two textures that make up the video that ARKit wants to display from the camera, and uses the YUVMaterial shader to combine them into the background that is rendered by the camera. (see UnityARVideo,cs)
+
+8. At this point, you should be able to place a bunch of 3D objects in the scene, build and run it and be able to see the objects you have placed and move the camera around in the scene by moving your device in the world.
+
+9. You can use the ARKit provided HitTest API to interact with the scene. See https://developer.apple.com/documentation/arkit/arhittestresult.resulttype for the types of things you can hit in the scene.  m_session.HitTest(point, resultTypes)  will return a list of the hit results.  You can use the results to determine where to place your virtual objects.  (see UnityARHitTestExample.cs)
+
+10. If you have asked ARKit to do plane detection for you in the session configuration, you can hook into the events that ARKit returns for those via the plugin: UnityARSessionNativeInterface.ARAnchorAddedEvent, UnityARSessionNativeInterface.ARAnchorUpdatedEvent, and UnityARSessionNativeInterface.ARAnchorRemovedEvent.  The delegates for all of these take the form AnchorUpdate(ARPlaneAnchor arPlaneAnchor).  You can choose to render GameObjects that correspond with these planes, or just use them to "anchor" your virtual content. (see UnityARAnchorManager.cs)
+
+11. If you would like to get ARKit frame updates, which includes the point cloud data (https://developer.apple.com/documentation/arkit/arpointcloud), hook into the event UnityARSessionNativeInterface.ARFrameUpdatedEvent. The delegate is of the form ARFrameUpdated(unityarcamera), and you can get point cloud data from unityarcamera.pointCloudData. (see PointCloudParticleExample.cs)
+
+12. Using ARFrameUpdateEvent as in the previous step can also be used update the camera position, rotation and projection matrix (instead of steps 5 and 6), but be aware that this would update at the pace of the ARKit rather than update rate of the Unity rendering engine.  You may have to use utility functions provided to get the results in the right coordinate system.
+
+13. You can obtain light estimation of the scene (https://developer.apple.com/documentation/arkit/arlightestimate) by calling m_session.GetARAmbientIntensity() on every Update. (see UnityARAmbient.cs)
+
+14. You can add and remove your own anchors to ARKit.  There is a component named UnityARUserAnchorComponent that implements one way this API can be used to associate a game object with an anchor.
+
+15. You can hook into ARKit Session Interrupted/InterruptionEnded callbacks by subscribing to them on the UnityARSessionNativeInterface.
+
+16. You can hook into the ARKit tracking changed callback by subscribing to the corresponding event in UnityARSessionNativeInterface.
+
