@@ -5,8 +5,9 @@
 	using UnityEngine;
 	using Mapbox.Unity.Utilities;
 	using UnityEngine.XR.iOS;
+	using System;
 
-	public class ManualSynchronizationContextBehaviour : MonoBehaviour
+	public class ManualSynchronizationContextBehaviour : MonoBehaviour, ISynchronizationContext
 	{
 		[SerializeField]
 		MapAtCurrentLocation _map;
@@ -22,6 +23,8 @@
 
 		float _lastHeight;
 		float _lastHeading;
+
+		public event Action<Alignment> OnAlignmentAvailable = delegate { };
 
 		void Start()
 		{
@@ -44,9 +47,13 @@
 		void LocationProvider_OnLocationUpdated(object snder, LocationUpdatedEventArgs e)
 		{
 			var alignment = new Alignment();
-			alignment.Position = -Conversions.GeoToWorldPosition(e.Location, _map.CenterMercator, 1f).ToVector3xz() + _map.Root.position;
+			alignment.Position = -Conversions.GeoToWorldPosition(e.Location, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz() + _map.Root.position;
 			alignment.Position.y = _lastHeight;
 			alignment.Rotation = -_lastHeading + _map.Root.localEulerAngles.y;
+
+			// TODO: change this so that alignment strategies listen to this event, rather than telling them to align.
+			OnAlignmentAvailable(alignment);
+
 			_alignmentStrategy.Align(alignment);
 			var mapCameraPosition = Vector3.zero;
 			mapCameraPosition.y = _mapCamera.localPosition.y;
@@ -60,14 +67,6 @@
 		{
 			_lastHeight = UnityARMatrixOps.GetPosition(anchorData.transform).y;
 			Unity.Utilities.Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
-		}
-
-		void SynchronizationContext_OnAlignmentAvailable(Ar.Alignment alignment)
-		{
-			var position = alignment.Position;
-			position.y = _lastHeight;
-			alignment.Position = position;
-			_alignmentStrategy.Align(alignment);
 		}
 	}
 }
