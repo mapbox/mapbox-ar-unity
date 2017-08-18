@@ -6,5 +6,5 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/AutomaticWorldSynchronization.unity
-    guid: c60dfd6bb74264e44b3dbf93e9d129c4
+    path: Assets/Scenes/ManualWorldSynchronization.unity
+    guid: d9ff170f22f0545c3970a889a592f312

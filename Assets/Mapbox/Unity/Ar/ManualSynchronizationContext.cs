@@ -11,9 +11,10 @@ namespace Mapbox.Unity.Ar
 		public void AddSynchronizationNodes(Location gpsNode, Vector3 arNode)
 		{
 			var alignment = new Alignment();
+			//alignment.
 			// TODO: manually add a position and heading offset.
 
-			OnAlignmentAvailable(alignment);
+			//OnAlignmentAvailable(alignment);
 		}
 	}
 }
