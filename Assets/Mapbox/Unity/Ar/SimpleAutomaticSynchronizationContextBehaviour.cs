@@ -1,12 +1,13 @@
-﻿namespace Mapbox.Unity.Ar
+namespace Mapbox.Unity.Ar
 {
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Location;
 	using UnityEngine;
 	using Mapbox.Unity.Utilities;
 	using UnityEngine.XR.iOS;
+	using System;
 
-	public class SimpleAutomaticSynchronizationContextBehaviour : MonoBehaviour
+	public class SimpleAutomaticSynchronizationContextBehaviour : MonoBehaviour, ISynchronizationContext
 	{
 		[SerializeField]
 		Transform _arPositionReference;
@@ -18,6 +19,9 @@
 		bool _useAutomaticSynchronizationBias;
 
 		[SerializeField]
+		AbstractAlignmentStrategy _alignmentStrategy;
+
+		[SerializeField]
 		float _synchronizationBias = 1f;
 
 		[SerializeField]
@@ -26,15 +30,15 @@
 		[SerializeField]
 		float _minimumDeltaDistance = 2f;
 
-		[SerializeField]
-		AbstractAlignmentStrategy _alignmentStrategy;
-
 		SimpleAutomaticSynchronizationContext _synchronizationContext;
 
 		float _lastHeading;
 		float _lastHeight;
 
 		ILocationProvider _locationProvider;
+
+		public event Action<Alignment> OnAlignmentAvailable = delegate { };
+
 		public ILocationProvider LocationProvider
 		{
 			private get
@@ -64,6 +68,7 @@
 
 		void Start()
 		{
+			_alignmentStrategy.Register(this);
 			_synchronizationContext = new SimpleAutomaticSynchronizationContext();
 			_synchronizationContext.MinimumDeltaDistance = _minimumDeltaDistance;
 			_synchronizationContext.ArTrustRange = _arTrustRange;
@@ -73,6 +78,11 @@
 			_map.OnInitialized += Map_OnInitialized;
 			UnityARSessionNativeInterface.ARAnchorAddedEvent += AnchorAdded;
 			UnityARSessionNativeInterface.ARSessionTrackingChangedEvent += UnityARSessionNativeInterface_ARSessionTrackingChanged;
+		}
+
+		void OnDestroy()
+		{
+			_alignmentStrategy.Unregister(this);
 		}
 
 		void Map_OnInitialized()
@@ -89,18 +99,18 @@
 		void AnchorAdded(ARPlaneAnchor anchorData)
 		{
 			_lastHeight = UnityARMatrixOps.GetPosition(anchorData.transform).y;
-			Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
+			Unity.Utilities.Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
 		}
 
 		// FIXME: for some reason, I never get "normal." Use caution, here.
 		void UnityARSessionNativeInterface_ARSessionTrackingChanged(UnityEngine.XR.iOS.UnityARCamera camera)
 		{
-			Console.Instance.Log(string.Format("AR Tracking State Changed: {0}: {1}", camera.trackingState, camera.trackingReason), "silver");
+			Unity.Utilities.Console.Instance.Log(string.Format("AR Tracking State Changed: {0}: {1}", camera.trackingState, camera.trackingReason), "silver");
 		}
 
 		void LocationProvider_OnLocationUpdated(object sender, LocationUpdatedEventArgs e)
 		{
-			Console.Instance.Log(string.Format("Location: {0},{1}\tAccuracy: {2}\tHeading: {3}",
+			Unity.Utilities.Console.Instance.Log(string.Format("Location: {0},{1}\tAccuracy: {2}\tHeading: {3}",
 																	e.Location.x, e.Location.y, e.Accuracy, _lastHeading), "lightblue");
 
 			var location = new Location();
@@ -122,7 +132,7 @@
 			var position = alignment.Position;
 			position.y = _lastHeight;
 			alignment.Position = position;
-			_alignmentStrategy.Align(alignment);
+			OnAlignmentAvailable(alignment);
 		}
 	}
 }

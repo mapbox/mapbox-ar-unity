@@ -16,10 +16,10 @@
 		Transform _mapCamera;
 
 		[SerializeField]
-		AbstractAlignmentStrategy _alignmentStrategy;
+		TransformLocationProvider _locationProvider;
 
 		[SerializeField]
-		TransformLocationProvider _locationProvider;
+		AbstractAlignmentStrategy _alignmentStrategy;
 
 		float _lastHeight;
 		float _lastHeading;
@@ -28,8 +28,14 @@
 
 		void Start()
 		{
+			_alignmentStrategy.Register(this);
 			_map.OnInitialized += Map_OnInitialized;
 			UnityARSessionNativeInterface.ARAnchorAddedEvent += AnchorAdded;
+		}
+
+		void OnDestroy()
+		{
+			_alignmentStrategy.Unregister(this);
 		}
 
 		void Map_OnInitialized()
@@ -51,10 +57,9 @@
 			alignment.Position.y = _lastHeight;
 			alignment.Rotation = -_lastHeading + _map.Root.localEulerAngles.y;
 
-			// TODO: change this so that alignment strategies listen to this event, rather than telling them to align.
 			OnAlignmentAvailable(alignment);
 
-			_alignmentStrategy.Align(alignment);
+			// Reset camera to avoid confusion.
 			var mapCameraPosition = Vector3.zero;
 			mapCameraPosition.y = _mapCamera.localPosition.y;
 			var mapCameraRotation = Vector3.zero;

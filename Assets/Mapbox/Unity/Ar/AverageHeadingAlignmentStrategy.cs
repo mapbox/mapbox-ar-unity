@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Ar
+namespace Mapbox.Unity.Ar
 {
 	using Mapbox.Unity.Utilities;
 	using System.Collections.Generic;
@@ -21,7 +21,7 @@
 		Quaternion _targetRotation;
 		Vector3 _targetPosition;
 
-		public override void Align(Alignment alignment)
+		public override void OnAlignmentAvailable(Alignment alignment)
 		{
 			var count = _rotations.Count;
 			var rotation = alignment.Rotation;

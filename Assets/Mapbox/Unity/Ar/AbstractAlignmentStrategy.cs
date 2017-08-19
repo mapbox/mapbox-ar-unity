@@ -7,6 +7,16 @@ namespace Mapbox.Unity.Ar
 		[SerializeField]
 		protected Transform _transform;
 
-		public abstract void Align(Alignment alignment);
+		public void Register(ISynchronizationContext context)
+		{
+			context.OnAlignmentAvailable += OnAlignmentAvailable;
+		}
+
+		public void Unregister(ISynchronizationContext context)
+		{
+			context.OnAlignmentAvailable -= OnAlignmentAvailable;
+		}
+
+		public abstract void OnAlignmentAvailable(Alignment alignment);
 	}
 }

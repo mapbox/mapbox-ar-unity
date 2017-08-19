@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Ar
+namespace Mapbox.Unity.Ar
 {
 	using UnityEngine;
 
@@ -10,7 +10,7 @@
 		Vector3 _targetPosition;
 		Quaternion _targetRotation = Quaternion.identity;
 
-		public override void Align(Alignment alignment)
+		public override void OnAlignmentAvailable(Alignment alignment)
 		{
 			_targetPosition = alignment.Position;
 			_targetRotation = Quaternion.Euler(0, alignment.Rotation, 0);
