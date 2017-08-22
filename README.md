@@ -1,5 +1,5 @@
 
-![unity_city markers](https://user-images.githubusercontent.com/12749701/29540537-b0a74da8-8683-11e7-8a84-a05fb2400c29.png)
+![plus-unity_city markers](https://user-images.githubusercontent.com/12749701/29585661-cfa223ae-873c-11e7-8d62-48024d759cdb.png)
 
 # Mapbox Unity SDK + ARKit For World-scale AR Experiences
 A place to create/learn with Unity, ARKit, and Mapbox!
