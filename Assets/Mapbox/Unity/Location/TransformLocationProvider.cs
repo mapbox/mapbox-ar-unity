@@ -82,11 +82,11 @@ namespace Mapbox.Unity.Location
 			return _targetTransform.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 		}
 
-		void SendEvents()
+		public void SendEvents()
 		{
 			if (OnHeadingUpdated != null)
 			{
-				OnHeadingUpdated(this, new HeadingUpdatedEventArgs() { Heading = _targetTransform.eulerAngles.y });
+				OnHeadingUpdated(this, new HeadingUpdatedEventArgs() { Heading = _targetTransform.localEulerAngles.y });
 			}
 
 			if (OnLocationUpdated != null)

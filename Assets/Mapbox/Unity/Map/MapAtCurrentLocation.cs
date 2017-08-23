@@ -68,11 +68,13 @@
 			}
 		}
 
+		float _worldRelativeScale;
+
 		public float WorldRelativeScale
 		{
 			get
 			{
-				return 1;
+				return _worldRelativeScale;
 			}
 		}
 
@@ -136,8 +138,11 @@
 			_mapVisualizer.Initialize(this, _fileSouce);
 			_tileProvider.Initialize(this);
 #if !UNITY_EDITOR
-			_root.localPosition = -Conversions.GeoToWorldPosition(_mapCenterLatitudeLongitude.x, _mapCenterLatitudeLongitude.y, _mapCenterMercator, 1f).ToVector3xz();
+			//_root.localPosition = -Conversions.GeoToWorldPosition(_mapCenterLatitudeLongitude.x, _mapCenterLatitudeLongitude.y, _mapCenterMercator, 1f).ToVector3xz();
 #endif
+			var relativeScale =  Mathf.Cos(Mathf.Deg2Rad * (float)_mapCenterLatitudeLongitude.x);
+			_root.localScale = Vector3.one * relativeScale;
+			_worldRelativeScale = relativeScale;
 			OnInitialized();
 		}
 
