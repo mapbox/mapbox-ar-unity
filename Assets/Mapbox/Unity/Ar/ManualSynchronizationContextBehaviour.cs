@@ -53,9 +53,13 @@
 		void LocationProvider_OnLocationUpdated(object snder, LocationUpdatedEventArgs e)
 		{
 			var alignment = new Alignment();
-			alignment.Position = -Conversions.GeoToWorldPosition(e.Location, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz() + _map.Root.position;
-			alignment.Position.y = _lastHeight;
+			var originalPosition = _map.Root.position;
 			alignment.Rotation = -_lastHeading + _map.Root.localEulerAngles.y;
+
+			// Rotate our offset by the last heading.
+			var rotation = Quaternion.Euler(0, -_lastHeading, 0);
+			alignment.Position = rotation * (-Conversions.GeoToWorldPosition(e.Location, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz() + originalPosition);
+			alignment.Position.y = _lastHeight;
 
 			OnAlignmentAvailable(alignment);
 
@@ -65,7 +69,7 @@
 			var mapCameraRotation = Vector3.zero;
 			mapCameraRotation.x = _mapCamera.localEulerAngles.x;
 			_mapCamera.localPosition = mapCameraPosition;
-			_mapCamera.RotateAround(_map.Root.position, Vector3.up, -_lastHeading);
+			_mapCamera.eulerAngles = mapCameraRotation;
 		}
 
 		void AnchorAdded(ARPlaneAnchor anchorData)
