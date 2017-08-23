@@ -26,7 +26,7 @@ For additional inspiration and reference, please [see this library for iOS](http
 - [Building Occlusion](https://twitter.com/davidrhodester/status/892501191875190784)
 - [Directions](https://twitter.com/davidrhodester/status/893197138368241664)
 - Pedestrian Navigation
-- ![img_2641](https://user-images.githubusercontent.com/23202691/29193942-a9e3aafe-7de4-11e7-93a7-6efd877de0ad.PNG)
+![img_2641](https://user-images.githubusercontent.com/23202691/29193942-a9e3aafe-7de4-11e7-93a7-6efd877de0ad.PNG)
 
 ## In this Repository
 
@@ -67,10 +67,6 @@ At the core, we use a `SimpleAutomaticSynchronizationContext` to align our map (
 
 ### ISynchronizationContext
 
-##### AddSynchronizationNodes(Location gpsNode, Vector3 arNode)
-
-You can think of a synchronization node as a comparison of ARKit and location data. You are essentially capturing the position of both "anchors" at the same time. We use this information in various implementations to compute an `Alignment`. 
-
 ##### OnAlignmentAvailable
 
 This event is sent when the context has successfully calculated an alignment for the world. This alignment can be used to manipulate a root transform so that it appears to be aligned with the AR camera.
@@ -105,6 +101,10 @@ The minimum distance that BOTH gps and ar delta vectors must differ before new n
 
 This represents the radius for which you trust ARKit's positional tracking, relative to the last alignment. Think of it as `accuracy`, but for AR position.
 
+##### AddSynchronizationNodes(Location gpsNode, Vector3 arNode)
+
+You can think of a synchronization node as a comparison of ARKit and location data. You are essentially capturing the position of both "anchors" at the same time. We use this information to compute our `Alignment`. 
+
 ### SimpleAutomaticSynchronizationContextBehaviour
 
 This class is mostly a monobehaviour wrapper around the context itself, which allows you to specify settings in the inspector. However, it also has knowledge of when ARAnchors are added, so as to offset the `Alignment` height based on a detected anchor height.
@@ -112,6 +112,12 @@ This class is mostly a monobehaviour wrapper around the context itself, which al
 This class is also responisble for listening to location updates from the `LocationProvider` and adding synchronization nodes (gps + ar positions) to the context. **Important: GPS positions must be converted to Unity coordinate space before adding to the context!**
 
 Lastly, this object needs an `AbstractAlignmentStrategy` which is used to determine how an `Alignment` should be processed. For example, you can snap, lerp, or filter and then lerp a transform (such as the `WorldRoot`). I've had the best success and most stable results using the `AverageHeadingAlignmentStrategy`.
+
+### ManualSynchronizationContextBehaviour
+
+This example context relies on a `TransformLocationProvider` that is a child of a camera responsible for drawing a top-down map. You can use touch input to drag (one finger) and rotate (two fingers) the camera to manually position and orient yourself relative to the map (your target location is represented with the red arrow in the example scene). On the release of a touch, the alignment will be created.
+
+*Note: This implementation does not attempt to compensate for ARKit-related drift over time!*
 
 ### AverageHeadingAlignmentStrategy
 
@@ -135,10 +141,6 @@ When we get a new alignment (that should not be dismissed), this value represent
 
 You will need to experiment with various `DesiredAccuracyInMeters` and `UpdateDistanceInMeters` settings. I recommend keeping your update distance on the higher side to prevent unnecssary alignment computation. The tradeoff, of course, is that you may begin to drift. Which value you use depdends entirely on your application.
 
-### Manual Calibration?
-
-You can easily implement `ManualSynchronizationContext` so that a user can manually calibrate their "session." One example is to use Mapbox Satellite data to build a map (as is done in the provided scene). You can drag this map or place pins on it to approximate your current physical location. You can also use an arrow to represent which direction are you facing. Note, however, that you will eventually see drift over time if no further calibration is done.
-
 ## Limitations
 
 This has been developed with TDD (see `SimpleAutomaticSynchronizationContextTests`). However, these tests are quite limited and do not yet fully encapsulate the different scenarios which will inevitably arise in reality. Additionally, while I have done extensive testing "on the ground," I've been in limited, specific locations, with ideal GPS accuracy. I make no guarantees that what is currently provided in this library will solve your problems or work in your area (please help me make it better).
@@ -154,7 +156,6 @@ There's a giant `Log` button. Use this log to help diagnose issues. If you're se
 Other issues to note:
 
 - ARKit tracking state is not really used to infuence this alignment process. If you lose tracking, fail to find anchors, background the application, etc., you will need to start a new session and calibrate again.
-- ​
 
 ## What about Mapbox?
 
