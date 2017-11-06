@@ -100,8 +100,18 @@ namespace UnityEngine.XR.iOS
 			int yHeight = camera.videoParams.yHeight;
 			int uvWidth = yWidth / 2;
 			int uvHeight = yHeight / 2;
-			remoteScreenYTex = new Texture2D(yWidth,yHeight, TextureFormat.R8, false, true);
-			remoteScreenUVTex = new Texture2D(uvWidth,uvHeight, TextureFormat.RG16, false, true);
+			if (remoteScreenYTex == null || remoteScreenYTex.width != yWidth || remoteScreenYTex.height != yHeight) {
+				if (remoteScreenYTex) {
+					Destroy (remoteScreenYTex);
+				}
+				remoteScreenYTex = new Texture2D (yWidth, yHeight, TextureFormat.R8, false, true);
+			}
+			if (remoteScreenUVTex == null || remoteScreenUVTex.width != uvWidth || remoteScreenUVTex.height != uvHeight) {
+				if (remoteScreenUVTex) {
+					Destroy (remoteScreenUVTex);
+				}
+				remoteScreenUVTex = new Texture2D (uvWidth, uvHeight, TextureFormat.RG16, false, true);
+			}
 
 			bTexturesInitialized = true;
 		}
