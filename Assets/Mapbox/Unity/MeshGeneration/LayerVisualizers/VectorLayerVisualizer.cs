@@ -9,11 +9,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.Unity.Utilities;
+	using System.Collections;
 
 	[Serializable]
 	public class TypeVisualizerTuple
 	{
 		public string Type;
+		[SerializeField]
 		public ModifierStackBase Stack;
 	}
 
@@ -44,24 +46,71 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		private List<FilterBase> Filters;
 
 		[SerializeField]
-		private ModifierStackBase _defaultStack;
+		[NodeEditorElementAttribute("Default Stack")]
+		public ModifierStackBase _defaultStack;
 		[SerializeField]
-		private List<TypeVisualizerTuple> Stacks;
+		[NodeEditorElementAttribute("Custom Stacks")]
+		public List<TypeVisualizerTuple> Stacks;
 
-		private GameObject _container;
+		[NonSerialized]
+		private Dictionary<UnityTile, List<int>> _activeCoroutines;
 
-		/// <summary>
-		/// Creates an object for each layer, extract and filter in/out the features and runs Build method on them.
-		/// </summary>
-		/// <param name="layer"></param>
-		/// <param name="tile"></param>
-		public override void Create(VectorTileLayer layer, UnityTile tile)
+		[NonSerialized]
+		private int _entityPerCoroutine = 20;
+		[NonSerialized]
+		private int _entityInCurrentCoroutine = 0;
+
+		public override void Initialize()
 		{
-			_container = new GameObject(Key + " Container");
-			_container.transform.SetParent(tile.transform, false);
+			base.Initialize();
+			_entityInCurrentCoroutine = 0;
+			_activeCoroutines = new Dictionary<UnityTile, List<int>>();
 
+			foreach (var filter in Filters)
+			{
+				if (filter != null)
+				{
+					filter.Initialize();
+				}
+			}
+			foreach (var item in Stacks)
+			{
+				if (item != null && item.Stack != null)
+				{
+					item.Stack.Initialize();
+				}
+			}
+			if (_defaultStack != null)
+			{
+				_defaultStack.Initialize();
+			}
+
+			foreach (var item in Stacks)
+			{
+				if (item != null && item.Stack != null)
+				{
+					item.Stack.Initialize();
+				}
+			}
+		}
+
+		public override void Create(VectorTileLayer layer, UnityTile tile, Action callback)
+		{
+			if (!_activeCoroutines.ContainsKey(tile))
+				_activeCoroutines.Add(tile, new List<int>());
+			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, callback)));
+		}
+
+		private IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
+		{
+			
 			//testing each feature with filters
 			var fc = layer.FeatureCount();
+			
+			//HACK to prevent request finishing on same frame which breaks modules started/finished events 
+			if(fc <= _entityPerCoroutine)
+				yield return null;
+
 			var filterOut = false;
 			for (int i = 0; i < fc; i++)
 			{
@@ -80,23 +129,37 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 
 				if (!filterOut)
-					Build(feature, tile, _container);
+				{
+					if (tile.VectorDataState != Enums.TilePropertyState.Cancelled)
+						Build(feature, tile, tile.gameObject);
+				}
+
+				_entityInCurrentCoroutine++;
+
+				if (_entityInCurrentCoroutine >= _entityPerCoroutine)
+				{
+					_entityInCurrentCoroutine = 0;
+					yield return null;
+				}
 			}
 
 			var mergedStack = _defaultStack as MergedModifierStack;
 			if (mergedStack != null)
 			{
-				mergedStack.End(tile, _container);
+				mergedStack.End(tile, tile.gameObject, layer.Name);
 			}
 
-			for (int i = 0; i < Stacks.Count; i++)
+			foreach (var item in Stacks)
 			{
-				mergedStack = Stacks[i].Stack as MergedModifierStack;
+				mergedStack = item.Stack as MergedModifierStack;
 				if (mergedStack != null)
 				{
-					mergedStack.End(tile, _container);
+					mergedStack.End(tile, tile.gameObject, layer.Name);
 				}
 			}
+
+			if (callback != null)
+				callback();
 		}
 
 		/// <summary>
@@ -164,6 +227,31 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			return "";
+		}
+
+		/// <summary>
+		/// Handle tile destruction event and propagate it to modifier stacks
+		/// </summary>
+		/// <param name="tile">Destroyed tile object</param>
+		public override void OnUnregisterTile(UnityTile tile)
+		{
+			base.OnUnregisterTile(tile);
+			tile.VectorDataState = Enums.TilePropertyState.Cancelled;
+			if (_activeCoroutines.ContainsKey(tile))
+			{
+				foreach (var cor in _activeCoroutines[tile])
+				{
+					Runnable.Stop(cor);
+				}
+			}
+
+			if (_defaultStack != null)
+				_defaultStack.UnregisterTile(tile);
+			foreach (var val in Stacks)
+			{
+				if (val != null && val.Stack != null)
+					val.Stack.UnregisterTile(tile);
+			}
 		}
 	}
 }

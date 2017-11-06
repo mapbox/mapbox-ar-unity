@@ -1,5 +1,6 @@
 namespace Mapbox.Unity.Map
 {
+	using System.Linq;
 	using UnityEngine;
 	using Mapbox.Map;
 	using Mapbox.Unity.Utilities;
@@ -31,7 +32,7 @@ namespace Mapbox.Unity.Map
 		UnwrappedTileId _cachedTile;
 		UnwrappedTileId _currentTile;
 
-		internal override void OnInitialized()
+		public override void OnInitialized()
 		{
 			_groundPlane = new Plane(Vector3.up, Mapbox.Unity.Constants.Math.Vector3Zero);
 			_viewportTarget = new Vector3(0.5f, 0.5f, 0);
@@ -74,10 +75,10 @@ namespace Mapbox.Unity.Map
 
 		void Cleanup(UnwrappedTileId currentTile)
 		{
-			var count = _activeTiles.Count;
-			for (int i = count - 1; i >= 0; i--)
+			var keys = _activeTiles.Keys.ToList();
+			for (int i = 0; i < keys.Count; i++)
 			{
-				var tile = _activeTiles[i];
+				var tile = keys[i];
 				bool dispose = false;
 				dispose = tile.X > currentTile.X + _disposeBuffer || tile.X < _currentTile.X - _disposeBuffer;
 				dispose = dispose || tile.Y > _currentTile.Y + _disposeBuffer || tile.Y < _currentTile.Y - _disposeBuffer;

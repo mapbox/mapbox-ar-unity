@@ -1,5 +1,6 @@
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
+	using Mapbox.Unity.MeshGeneration.Data;
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Components;
     
@@ -9,18 +10,18 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         [SerializeField]
         private ColliderType _colliderType;
 
-        public override void Run(FeatureBehaviour fb)
+		public override void Run(VectorEntity ve, UnityTile tile)
         {
             switch (_colliderType)
             {
                 case ColliderType.BoxCollider:
-                    fb.gameObject.AddComponent<BoxCollider>();
+                    ve.GameObject.AddComponent<BoxCollider>();
                     break;
                 case ColliderType.MeshCollider:
-                    fb.gameObject.AddComponent<MeshCollider>();
+                    ve.GameObject.AddComponent<MeshCollider>();
                     break;
                 case ColliderType.SphereCollider:
-                    fb.gameObject.AddComponent<SphereCollider>();
+                    ve.GameObject.AddComponent<SphereCollider>();
                     break;
                 default:
                     break;

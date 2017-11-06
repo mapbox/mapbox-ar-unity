@@ -5,6 +5,7 @@
 	using System.Collections.Generic;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Map;
+	using System.Collections;
 
 	public class CachingWebFileSource : IFileSource, IDisposable
 	{
@@ -161,8 +162,6 @@
 			}
 		}
 
-
-
 		class MemoryCacheAsyncRequest : IAsyncRequest
 		{
 
@@ -190,8 +189,5 @@
 				// Empty. We can't cancel an instantaneous response.
 			}
 		}
-
-
-
 	}
 }

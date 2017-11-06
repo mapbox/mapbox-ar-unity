@@ -13,7 +13,7 @@ namespace Mapbox.Unity.Ar
 		Transform _arPositionReference;
 
 		[SerializeField]
-		MapAtCurrentLocation _map;
+		AbstractMap _map;
 
 		[SerializeField]
 		bool _useAutomaticSynchronizationBias;
@@ -83,6 +83,7 @@ namespace Mapbox.Unity.Ar
 		void OnDestroy()
 		{
 			_alignmentStrategy.Unregister(this);
+			LocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
 		}
 
 		void Map_OnInitialized()
@@ -91,7 +92,6 @@ namespace Mapbox.Unity.Ar
 
 			// We don't want location updates until we have a map, otherwise our conversion will fail.
 			LocationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
-			LocationProvider.OnHeadingUpdated += LocationProvider_OnHeadingUpdated;
 		}
 
 		// TODO: use extents of anchor to determine "floor" plane.
@@ -108,23 +108,20 @@ namespace Mapbox.Unity.Ar
 			Unity.Utilities.Console.Instance.Log(string.Format("AR Tracking State Changed: {0}: {1}", camera.trackingState, camera.trackingReason), "silver");
 		}
 
-		void LocationProvider_OnLocationUpdated(object sender, LocationUpdatedEventArgs e)
+		void LocationProvider_OnLocationUpdated(Location location)
 		{
-			Unity.Utilities.Console.Instance.Log(string.Format("Location: {0},{1}\tAccuracy: {2}\tHeading: {3}",
-																	e.Location.x, e.Location.y, e.Accuracy, _lastHeading), "lightblue");
+			if (location.IsLocationUpdated)
+			{
+				var latitudeLongitude = location.LatitudeLongitude;
+				Unity.Utilities.Console.Instance.Log(string.Format("Location: {0},{1}\tAccuracy: {2}\tHeading: {3}",
+																   latitudeLongitude.x, latitudeLongitude.y, location.Accuracy, location.Heading), "lightblue");
 
-			var location = new Location();
-			location.Position = Conversions.GeoToWorldPosition(e.Location,
-																 _map.CenterMercator,
-																 _map.WorldRelativeScale).ToVector3xz();
+				var position = Conversions.GeoToWorldPosition(latitudeLongitude,
+															 	_map.CenterMercator,
+															 	_map.WorldRelativeScale).ToVector3xz();
 
-			location.Accuracy = e.Accuracy;
-			_synchronizationContext.AddSynchronizationNodes(location, _arPositionReference.localPosition);
-		}
-
-		void LocationProvider_OnHeadingUpdated(object sender, HeadingUpdatedEventArgs e)
-		{
-			_lastHeading = e.Heading;
+				_synchronizationContext.AddSynchronizationNodes(location, position, _arPositionReference.localPosition);
+			}
 		}
 
 		void SynchronizationContext_OnAlignmentAvailable(Ar.Alignment alignment)

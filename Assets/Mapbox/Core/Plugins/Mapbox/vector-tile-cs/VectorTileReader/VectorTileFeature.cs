@@ -88,7 +88,8 @@ namespace Mapbox.VectorTile
 				{
 					// process every ring of a polygon in a separate loop
 					List<List<Point2d<long>>> newGeom = new List<List<Point2d<long>>>();
-					for (int i = 0; i < geom.Count; i++)
+					int geomCount = geom.Count;
+					for (int i = 0; i < geomCount; i++)
 					{
 						List<Point2d<long>> part = geom[i];
 						List<List<Point2d<long>>> tmp = new List<List<Point2d<long>>>();
@@ -151,7 +152,8 @@ namespace Mapbox.VectorTile
 				throw new Exception(string.Format("Layer [{0}]: uneven number of feature tag ids", _layer.Name));
 			}
 			Dictionary<string, object> properties = new Dictionary<string, object>();
-			for (int i = 0; i < Tags.Count; i += 2)
+			int tagCount = Tags.Count;
+			for (int i = 0; i < tagCount; i += 2)
 			{
 				properties.Add(_layer.Keys[Tags[i]], _layer.Values[Tags[i + 1]]);
 			}
@@ -173,7 +175,8 @@ namespace Mapbox.VectorTile
 				throw new Exception(string.Format("Key [{0}] does not exist", key));
 			}
 
-			for (int i = 0; i < Tags.Count; i++)
+			int tagCount = Tags.Count;
+			for (int i = 0; i < tagCount; i++)
 			{
 				if (idxKey == Tags[i])
 				{

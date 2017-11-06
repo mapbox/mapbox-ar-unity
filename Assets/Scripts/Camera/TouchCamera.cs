@@ -31,7 +31,10 @@ public class TouchCamera : MonoBehaviour
 			_shouldDrag = false;
 			if (_wasTouching)
 			{
-				_locationProvider.SendEvents();
+				if (_locationProvider != null)
+				{
+					_locationProvider.SendLocationEvent();
+				}
 				_wasTouching = false;
 			}
 		}

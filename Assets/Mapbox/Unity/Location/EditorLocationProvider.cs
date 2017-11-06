@@ -9,7 +9,7 @@ namespace Mapbox.Unity.Location
 	/// The EditorLocationProvider is responsible for providing mock location and heading data
 	/// for testing purposes in the Unity editor.
 	/// </summary>
-	public class EditorLocationProvider : MonoBehaviour, ILocationProvider
+	public class EditorLocationProvider : AbstractEditorLocationProvider
 	{
 		/// <summary>
 		/// The mock "latitude, longitude" location, respresented with a string.
@@ -27,68 +27,22 @@ namespace Mapbox.Unity.Location
 		[Range(0, 359)]
 		float _heading;
 
-		[SerializeField]
-		float _accuracy = 5f;
-
-		[SerializeField]
-		bool _sendEventsOnUpdate;
-
-		[SerializeField]
-		bool _sendUpdate;
-
-		/// <summary>
-		/// Gets the current location, as specified in the inspector.
-		/// </summary>
-		/// <value>The location.</value>
-		public Vector2d Location
+		Vector2d LatitudeLongitude
 		{
 			get
 			{
-				var split = _latitudeLongitude.Split(',');
-				return new Vector2d(double.Parse(split[0]), double.Parse(split[1]));
+				return Conversions.StringToLatLon(_latitudeLongitude);
 			}
 		}
 
-		/// <summary>
-		/// Occurs every frame.
-		/// </summary>
-		public event EventHandler<HeadingUpdatedEventArgs> OnHeadingUpdated;
-
-		/// <summary>
-		/// Occurs every frame.
-		/// </summary>
-		public event EventHandler<LocationUpdatedEventArgs> OnLocationUpdated;
-
-#if UNITY_EDITOR
-		void Update()
+		protected override void SetLocation()
 		{
-			if (_sendEventsOnUpdate)
-			{
-				SendEvents();
-			}
-		}
-#endif
-
-		void SendEvents()
-		{
-			if (OnHeadingUpdated != null)
-			{
-				OnHeadingUpdated(this, new HeadingUpdatedEventArgs() { Heading = _heading });
-			}
-
-			if (OnLocationUpdated != null)
-			{
-				OnLocationUpdated(this, new LocationUpdatedEventArgs() { Location = Location, Accuracy = _accuracy });
-			}
-		}
-
-		void OnValidate()
-		{
-			if (_sendUpdate)
-			{
-				_sendUpdate = false;
-				SendEvents();
-			}
+			_currentLocation.Heading = _heading;
+			_currentLocation.LatitudeLongitude = LatitudeLongitude;
+			_currentLocation.Accuracy = _accuracy;
+			_currentLocation.Timestamp = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+			_currentLocation.IsLocationUpdated = true;
+			_currentLocation.IsHeadingUpdated = true;
 		}
 	}
 }

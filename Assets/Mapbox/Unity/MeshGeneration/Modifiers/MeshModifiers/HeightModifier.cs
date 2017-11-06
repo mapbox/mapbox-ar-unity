@@ -3,8 +3,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using System.Collections.Generic;
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Data;
+	using System;
 
-    public enum ExtrusionType
+	public enum ExtrusionType
     {
         Wall,
         FirstMidFloor,
@@ -30,6 +31,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[SerializeField]
 		[Tooltip("Fixed height value for ForceHeight option")]
 		private float _height;
+		private float _scale = 1;
 
 		[SerializeField]
 		[Tooltip("Create side walls from calculated height down to terrain level. Suggested for buildings, not suggested for roads.")]
@@ -37,22 +39,35 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
-        public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		[NonSerialized] private int _counter;
+
+
+		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
+		{
+			_scale = scale;
+			Run(feature, md);
+		}
+
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
             if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
                 return;
 
-            var minHeight = 0f;
-            float hf = _height;
+			if (tile != null)
+				_scale = tile.TileScale;
+
+			var minHeight = 0f;
+            float hf = _height * _scale;
             if (!_forceHeight)
             {
                 if (feature.Properties.ContainsKey("height"))
                 {
                     if (float.TryParse(feature.Properties["height"].ToString(), out hf))
                     {
+						hf *= _scale;
                         if (feature.Properties.ContainsKey("min_height"))
                         {
-                            minHeight = float.Parse(feature.Properties["min_height"].ToString());
+                            minHeight = float.Parse(feature.Properties["min_height"].ToString()) * _scale;
                             hf -= minHeight;
                         }
                     }
@@ -61,22 +76,24 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 {
                     if (float.TryParse(feature.Properties["ele"].ToString(), out hf))
                     {
+						hf *= _scale;
                     }
                 }
             }
 
             var max = md.Vertices[0].y;
             var min = md.Vertices[0].y;
-            if (_flatTops)
+			_counter = md.Vertices.Count;
+			if (_flatTops)
             {
-                for (int i = 0; i < md.Vertices.Count; i++)
+				for (int i = 0; i < _counter; i++)
                 {
                     if (md.Vertices[i].y > max)
                         max = md.Vertices[i].y;
                     else if (md.Vertices[i].y < min)
                         min = md.Vertices[i].y;
                 }
-                for (int i = 0; i < md.Vertices.Count; i++)
+                for (int i = 0; i < _counter; i++)
                 {
                     md.Vertices[i] = new Vector3(md.Vertices[i].x, max + minHeight + hf, md.Vertices[i].z);
                 }
@@ -84,14 +101,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             }
             else
             {
-                for (int i = 0; i < md.Vertices.Count; i++)
+                for (int i = 0; i < _counter; i++)
                 {
                     md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + minHeight + hf, md.Vertices[i].z);
                 }
             }
 
-			var count = md.Vertices.Count;
-			md.Vertices.Capacity = count + md.Edges.Count * 2;
+			
+			md.Vertices.Capacity = _counter + md.Edges.Count * 2;
 			float d = 0f;
 			Vector3 v1;
 			Vector3 v2;
@@ -99,10 +116,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			if (_createSideWalls)
 			{
-				var wallTri = new List<int>(md.Edges.Count * 3);
-				var wallUv = new List<Vector2>(md.Edges.Count * 2);
+				_counter = md.Edges.Count;
+				var wallTri = new List<int>(_counter * 3);
+				var wallUv = new List<Vector2>(_counter * 2);
 				Vector3 norm = Vector3.zero;
-				for (int i = 0; i < md.Edges.Count; i += 2)
+				for (int i = 0; i < _counter; i += 2)
 				{
 					v1 = md.Vertices[md.Edges[i]];
 					v2 = md.Vertices[md.Edges[i + 1]];

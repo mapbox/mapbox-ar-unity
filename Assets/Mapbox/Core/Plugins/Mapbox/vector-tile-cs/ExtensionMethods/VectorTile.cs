@@ -61,7 +61,8 @@ namespace Mapbox.VectorTile.ExtensionMethods
 
 					//resolve properties
 					List<string> keyValue = new List<string>();
-					for (int j = 0; j < feat.Tags.Count; j += 2)
+					int tagCnt = feat.Tags.Count;
+					for (int j = 0; j < tagCnt; j += 2)
 					{
 						string key = layer.Keys[feat.Tags[j]];
 						object val = layer.Values[feat.Tags[j + 1]];

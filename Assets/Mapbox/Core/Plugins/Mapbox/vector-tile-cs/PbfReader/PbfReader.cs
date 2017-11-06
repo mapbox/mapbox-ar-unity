@@ -92,7 +92,6 @@ namespace Mapbox.VectorTile
 				throw new System.Exception("not of type string, bytes or message");
 			}
 
-			ulong tmpPos = _pos;
 			ulong skipBytes = (ulong)Varint();
 			SkipBytes(skipBytes);
 
