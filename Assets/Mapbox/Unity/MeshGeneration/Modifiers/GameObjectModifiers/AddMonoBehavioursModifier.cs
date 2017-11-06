@@ -1,5 +1,6 @@
 ﻿namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
+	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Components;
 	using UnityEngine;
 
@@ -9,11 +10,11 @@
 		[SerializeField]
 		AddMonoBehavioursModifierType[] _types;
 
-		public override void Run(FeatureBehaviour fb)
+		public override void Run(VectorEntity ve, UnityTile tile)
 		{
 			foreach (var t in _types)
 			{
-				fb.gameObject.AddComponent(t.Type);
+				ve.GameObject.AddComponent(t.Type);
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 ﻿namespace Mapbox.Unity.Map
 {
+	using System.Linq;
 	using UnityEngine;
 	using Mapbox.Map;
 	using Mapbox.Utils;
@@ -8,7 +9,7 @@
 	public class RangeAroundTransformTileProvider : AbstractTileProvider
 	{
 		[SerializeField]
-		private Transform locationMarker;
+		private Transform _targetTransform;
 
 		[SerializeField]
 		private int _visibleBuffer;
@@ -17,13 +18,12 @@
 		private int _disposeBuffer;
 
 		private bool _initialized = false;
-		private Vector2d _currentLatLng;
 		private UnwrappedTileId _currentTile;
 		private UnwrappedTileId _cachedTile;
 
-		internal override void OnInitialized()
+		public override void OnInitialized()
 		{
-			if (locationMarker == null)
+			if (_targetTransform == null)
 			{
 				Debug.LogError("TransformTileProvider: No location marker transform specified.");
 				Destroy(this);
@@ -38,8 +38,7 @@
 		{
 			if (!_initialized) return;
 
-			_currentLatLng = locationMarker.localPosition.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
-			_currentTile = TileCover.CoordinateToTileId(_currentLatLng, _map.Zoom);
+			_currentTile = TileCover.CoordinateToTileId(_targetTransform.localPosition.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale), _map.Zoom);
 
 			if (!_currentTile.Equals(_cachedTile))
 			{
@@ -57,10 +56,10 @@
 
 		private void Cleanup(UnwrappedTileId currentTile)
 		{
-			var count = _activeTiles.Count;
-			for (int i = count - 1; i >= 0; i--)
+			var keys = _activeTiles.Keys.ToList();
+			for (int i = 0; i < keys.Count; i++)
 			{
-				var tile = _activeTiles[i];
+				var tile = keys[i];
 				bool dispose = false;
 				dispose = tile.X > currentTile.X + _disposeBuffer || tile.X < _currentTile.X - _disposeBuffer;
 				dispose = dispose || tile.Y > _currentTile.Y + _disposeBuffer || tile.Y < _currentTile.Y - _disposeBuffer;

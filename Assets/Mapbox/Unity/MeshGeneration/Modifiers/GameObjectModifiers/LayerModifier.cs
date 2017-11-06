@@ -2,8 +2,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Components;
-    
-
+	using Mapbox.Unity.MeshGeneration.Data;
 
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Layer Modifier")]
     public class LayerModifier : GameObjectModifier
@@ -11,9 +10,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         [SerializeField]
         private int _layerId;
 
-        public override void Run(FeatureBehaviour fb)
+		public override void Run(VectorEntity ve, UnityTile tile)
         {
-            fb.gameObject.layer = _layerId;
+            ve.GameObject.layer = _layerId;
         }
     }
 }

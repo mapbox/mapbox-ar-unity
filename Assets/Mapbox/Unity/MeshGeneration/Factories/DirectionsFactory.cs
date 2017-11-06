@@ -2,7 +2,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using UnityEngine;
 	using Mapbox.Directions;
+	using System.Collections.Generic;
+	using System.Linq;
 	using Mapbox.Unity.Map;
+	using Data;
 	using Modifiers;
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
@@ -10,47 +13,41 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	public class DirectionsFactory : MonoBehaviour
 	{
 		[SerializeField]
-		MapAtCurrentLocation _map;
+		AbstractMap _map;
 
 		[SerializeField]
-		MapVisualizer _mapVisualizer;
+		MeshModifier[] MeshModifiers;
 
 		[SerializeField]
 		Transform[] _waypoints;
 
 		[SerializeField]
-		LineRenderer _lineRenderer;
-
-		[SerializeField]
-		float _height = 1f;
+		Material _material;
 
 		Directions _directions;
 
 		void Awake()
 		{
 			_directions = MapboxAccess.Instance.Directions;
-			_mapVisualizer.OnMapVisualizerStateChanged += MapVisualizer_OnMapVisualizerStateChanged;
+			_map.OnInitialized += Query;
 		}
 
-		void MapVisualizer_OnMapVisualizerStateChanged(MeshGeneration.ModuleState state)
+		void OnDestroy()
 		{
-			if (state == ModuleState.Finished)
-			{
-				_mapVisualizer.OnMapVisualizerStateChanged -= MapVisualizer_OnMapVisualizerStateChanged;
-				Query();
-			}
+			_map.OnInitialized -= Query;
 		}
 
 		void Query()
 		{
+			_map.OnInitialized -= Query;
 			var count = _waypoints.Length;
 			var wp = new Vector2d[count];
 			for (int i = 0; i < count; i++)
 			{
-				wp[i] = _waypoints[i].GetLocalGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
+				wp[i] = _waypoints[i].GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 			}
 			var _directionResource = new DirectionResource(wp, RoutingProfile.Driving);
-			_directionResource.RoutingProfile = RoutingProfile.Walking;
+			_directionResource.Steps = true;
 			_directions.Query(_directionResource, HandleDirectionsResponse);
 		}
 
@@ -61,15 +58,47 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				return;
 			}
 
-			var count = response.Routes[0].Geometry.Count;
-			_lineRenderer.positionCount = count;
-			for (int i = 0; i < count; i++)
+			var meshData = new MeshData();
+			var dat = new List<Vector3>();
+			foreach (var point in response.Routes[0].Geometry)
 			{
-				var point = response.Routes[0].Geometry[i];
-				var position = Conversions.GeoToWorldPosition(point.x, point.y, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz();
-				position.y = _height;
-				_lineRenderer.SetPosition(i, position);
+				dat.Add(Conversions.GeoToWorldPosition(point.x, point.y, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz());
 			}
+
+			var feat = new VectorFeatureUnity();
+			feat.Points.Add(dat);
+
+			foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
+			{
+				mod.Run(feat, meshData, _map.WorldRelativeScale);
+			}
+
+			CreateGameObject(meshData);
+		}
+
+		GameObject CreateGameObject(MeshData data)
+		{
+			var go = new GameObject("direction waypoint " + " entity");
+			var mesh = go.AddComponent<MeshFilter>().mesh;
+			mesh.subMeshCount = data.Triangles.Count;
+
+			mesh.SetVertices(data.Vertices);
+			for (int i = 0; i < data.Triangles.Count; i++)
+			{
+				var triangle = data.Triangles[i];
+				mesh.SetTriangles(triangle, i);
+			}
+
+			for (int i = 0; i < data.UV.Count; i++)
+			{
+				var uv = data.UV[i];
+				mesh.SetUVs(i, uv);
+			}
+
+			mesh.RecalculateNormals();
+			go.AddComponent<MeshRenderer>().material = _material;
+			return go;
 		}
 	}
+
 }

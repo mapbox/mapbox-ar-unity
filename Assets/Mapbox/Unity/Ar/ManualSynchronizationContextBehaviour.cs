@@ -10,7 +10,7 @@
 	public class ManualSynchronizationContextBehaviour : MonoBehaviour, ISynchronizationContext
 	{
 		[SerializeField]
-		MapAtCurrentLocation _map;
+		AbstractMap _map;
 
 		[SerializeField]
 		Transform _mapCamera;
@@ -36,40 +36,40 @@
 		void OnDestroy()
 		{
 			_alignmentStrategy.Unregister(this);
+			_locationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
 		}
 
 		void Map_OnInitialized()
 		{
 			_map.OnInitialized -= Map_OnInitialized;
-			_locationProvider.OnHeadingUpdated += LocationProvider_OnHeadingUpdated;
 			_locationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
 		}
 
-		void LocationProvider_OnHeadingUpdated(object sender, Unity.Location.HeadingUpdatedEventArgs e)
+		void LocationProvider_OnLocationUpdated(Location location)
 		{
-			_lastHeading = e.Heading;
-		}
+			if (location.IsLocationUpdated)
+			{
+				var alignment = new Alignment();
+				var originalPosition = _map.Root.position;
+				alignment.Rotation = -location.Heading + _map.Root.localEulerAngles.y;
 
-		void LocationProvider_OnLocationUpdated(object snder, LocationUpdatedEventArgs e)
-		{
-			var alignment = new Alignment();
-			var originalPosition = _map.Root.position;
-			alignment.Rotation = -_lastHeading + _map.Root.localEulerAngles.y;
+				// Rotate our offset by the last heading.
+				var rotation = Quaternion.Euler(0, -_lastHeading, 0);
+				alignment.Position = rotation * (-Conversions.GeoToWorldPosition(location.LatitudeLongitude,
+																				 _map.CenterMercator,
+																				 _map.WorldRelativeScale).ToVector3xz() + originalPosition);
+				alignment.Position.y = _lastHeight;
 
-			// Rotate our offset by the last heading.
-			var rotation = Quaternion.Euler(0, -_lastHeading, 0);
-			alignment.Position = rotation * (-Conversions.GeoToWorldPosition(e.Location, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz() + originalPosition);
-			alignment.Position.y = _lastHeight;
+				OnAlignmentAvailable(alignment);
 
-			OnAlignmentAvailable(alignment);
-
-			// Reset camera to avoid confusion.
-			var mapCameraPosition = Vector3.zero;
-			mapCameraPosition.y = _mapCamera.localPosition.y;
-			var mapCameraRotation = Vector3.zero;
-			mapCameraRotation.x = _mapCamera.localEulerAngles.x;
-			_mapCamera.localPosition = mapCameraPosition;
-			_mapCamera.eulerAngles = mapCameraRotation;
+				// Reset camera to avoid confusion.
+				var mapCameraPosition = Vector3.zero;
+				mapCameraPosition.y = _mapCamera.localPosition.y;
+				var mapCameraRotation = Vector3.zero;
+				mapCameraRotation.x = _mapCamera.localEulerAngles.x;
+				_mapCamera.localPosition = mapCameraPosition;
+				_mapCamera.eulerAngles = mapCameraRotation;
+			}
 		}
 
 		void AnchorAdded(ARPlaneAnchor anchorData)

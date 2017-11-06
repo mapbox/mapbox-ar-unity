@@ -22,13 +22,11 @@ namespace Mapbox.VectorTile
 		/// <param name="validate">If true, run checks if the tile contains valid data. Decreases decoding speed.</param>
 		public VectorTile(byte[] data, bool validate = true)
 		{
-			_Layers = new List<VectorTileLayer>();
 			_VTR = new VectorTileReader(data, validate);
 		}
 
 
 		private VectorTileReader _VTR;
-		private List<VectorTileLayer> _Layers;
 
 
 		/// <summary>

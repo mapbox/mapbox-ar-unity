@@ -125,28 +125,15 @@ namespace Mapbox.Unity.Utilities
 			return Conversions.MetersToLatLon(pos);
 		}
 
-		public static Vector2d GetLocalGeoPosition(this Transform t, Vector2d refPoint, float scale = 1)
-		{
-			var pos = refPoint + (t.localPosition / scale).ToVector2d();
-			return Conversions.MetersToLatLon(pos);
-		}
-
 		public static Vector2d GetGeoPosition(this Vector3 position, Vector2d refPoint, float scale = 1)
 		{
 			var pos = refPoint + (position / scale).ToVector2d();
 			return Conversions.MetersToLatLon(pos);
 		}
 
-		//public static float SignedAngle(this Vector3 from, Vector3 to)
-		//{
-		//	var angle = Vector3.Angle(from, to);
-		//	var cross = Vector3.Cross(from, to);
-		//	if (cross.y < 0)
-		//	{
-		//		angle = -angle;
-		//	}
-
-		//	return angle;
-		//}
+		public static Vector2d GetGeoPosition(this Vector2 position, Vector2d refPoint, float scale = 1)
+		{
+			return position.ToVector3xz().GetGeoPosition(refPoint, scale);
+		}
 	}
 }

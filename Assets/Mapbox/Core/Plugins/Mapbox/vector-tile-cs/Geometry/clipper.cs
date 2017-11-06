@@ -112,8 +112,11 @@ namespace Mapbox.VectorTile.Geometry
 
 				public void Clear()
 				{
-					for (int i = 0; i < m_AllPolys.Count; i++)
+					int polyCnt = m_AllPolys.Count;
+					for (int i = 0; i < polyCnt; i++)
+					{
 						m_AllPolys[i] = null;
+					}
 					m_AllPolys.Clear();
 					m_Childs.Clear();
 				}
@@ -721,10 +724,14 @@ namespace Mapbox.VectorTile.Geometry
 				public virtual void Clear()
 				{
 					DisposeLocalMinimaList();
-					for (int i = 0; i < m_edges.Count; ++i)
+					int edgesCnt = m_edges.Count;
+					for (int i = 0; i < edgesCnt; ++i)
 					{
-						for (int j = 0; j < m_edges[i].Count; ++j)
+						int edgesIcount = m_edges[i].Count;
+						for (int j = 0; j < edgesIcount; ++j)
+						{
 							m_edges[i][j] = null;
+						}
 						m_edges[i].Clear();
 					}
 					m_edges.Clear();
@@ -790,7 +797,7 @@ namespace Mapbox.VectorTile.Geometry
 				private TEdge FindNextLocMin(TEdge E)
 				{
 					TEdge E2;
-					for (;;)
+					for (; ; )
 					{
 						while (E.Bot != E.Prev.Bot || E.Curr == E.Top)
 							E = E.Next;
@@ -977,7 +984,7 @@ namespace Mapbox.VectorTile.Geometry
 
 					//2. Remove duplicate vertices, and (when closed) collinear edges ...
 					TEdge E = eStart, eLoopStop = eStart;
-					for (;;)
+					for (; ; )
 					{
 						//nb: allows matching start and end points when not Closed ...
 						if (E.Curr == E.Next.Curr && (Closed || E.Next != eStart))
@@ -1049,7 +1056,7 @@ namespace Mapbox.VectorTile.Geometry
 						locMin.RightBound = E;
 						locMin.RightBound.Side = EdgeSide.esRight;
 						locMin.RightBound.WindDelta = 0;
-						for (;;)
+						for (; ; )
 						{
 							if (E.Bot.X != E.Prev.Top.X)
 								ReverseHorizontal(E);
@@ -1072,7 +1079,7 @@ namespace Mapbox.VectorTile.Geometry
 					if (E.Prev.Bot == E.Prev.Top)
 						E = E.Next;
 
-					for (;;)
+					for (; ; )
 					{
 						E = FindNextLocMin(E);
 						if (E == EMin)
@@ -1132,7 +1139,8 @@ namespace Mapbox.VectorTile.Geometry
 				public bool AddPaths(Paths ppg, PolyType polyType, bool closed)
 				{
 					bool result = false;
-					for (int i = 0; i < ppg.Count; ++i)
+					int ppgCnt = ppg.Count;
+					for (int i = 0; i < ppgCnt; ++i)
 						if (AddPath(ppg[i], polyType, closed))
 							result = true;
 					return result;
@@ -1261,7 +1269,9 @@ namespace Mapbox.VectorTile.Geometry
 					result.top = paths[i][0].Y;
 					result.bottom = result.top;
 					for (; i < cnt; i++)
-						for (int j = 0; j < paths[i].Count; j++)
+					{
+						int pathsIcnt = paths[i].Count;
+						for (int j = 0; j < pathsIcnt; j++)
 						{
 							if (paths[i][j].X < result.left)
 								result.left = paths[i][j].X;
@@ -1272,6 +1282,7 @@ namespace Mapbox.VectorTile.Geometry
 							else if (paths[i][j].Y > result.bottom)
 								result.bottom = paths[i][j].Y;
 						}
+					}
 					return result;
 				}
 				//------------------------------------------------------------------------------
@@ -1695,8 +1706,11 @@ namespace Mapbox.VectorTile.Geometry
 
 				private void DisposeAllPolyPts()
 				{
-					for (int i = 0; i < m_PolyOuts.Count; ++i)
+					int polyCnt = m_PolyOuts.Count;
+					for (int i = 0; i < polyCnt; ++i)
+					{
 						DisposeOutRec(i);
+					}
 					m_PolyOuts.Clear();
 				}
 				//------------------------------------------------------------------------------
@@ -1788,7 +1802,8 @@ namespace Mapbox.VectorTile.Geometry
 						if (Op1 != null && IsHorizontal(rb) &&
 						  m_GhostJoins.Count > 0 && rb.WindDelta != 0)
 						{
-							for (int i = 0; i < m_GhostJoins.Count; i++)
+							int ghostCnt = m_GhostJoins.Count;
+							for (int i = 0; i < ghostCnt; i++)
 							{
 								//if the horizontal Rb and a 'ghost' horizontal overlap, then convert
 								//the 'ghost' join to a real join ready for later ...
@@ -2947,7 +2962,7 @@ namespace Mapbox.VectorTile.Geometry
 					}
 
 					OutPt op1 = null;
-					for (;;) //loop through consec. horizontal edges
+					for (; ; ) //loop through consec. horizontal edges
 					{
 						bool IsLastHorz = (horzEdge == eLastHorz);
 						TEdge e = GetNextInAEL(horzEdge, dir);
@@ -3273,7 +3288,8 @@ namespace Mapbox.VectorTile.Geometry
 
 				private void ProcessIntersectList()
 				{
-					for (int i = 0; i < m_IntersectList.Count; i++)
+					int intersectCnt = m_IntersectList.Count;
+					for (int i = 0; i < intersectCnt; i++)
 					{
 						IntersectNode iNode = m_IntersectList[i];
 						{
@@ -3567,7 +3583,8 @@ namespace Mapbox.VectorTile.Geometry
 				{
 					polyg.Clear();
 					polyg.Capacity = m_PolyOuts.Count;
-					for (int i = 0; i < m_PolyOuts.Count; i++)
+					int polyCnt = m_PolyOuts.Count;
+					for (int i = 0; i < polyCnt; i++)
 					{
 						OutRec outRec = m_PolyOuts[i];
 						if (outRec.Pts == null)
@@ -3593,7 +3610,8 @@ namespace Mapbox.VectorTile.Geometry
 
 					//add each output polygon/contour to polytree ...
 					polytree.m_AllPolys.Capacity = m_PolyOuts.Count;
-					for (int i = 0; i < m_PolyOuts.Count; i++)
+					int polyCnt = m_PolyOuts.Count;
+					for (int i = 0; i < polyCnt; i++)
 					{
 						OutRec outRec = m_PolyOuts[i];
 						int cnt = PointCount(outRec.Pts);
@@ -3615,7 +3633,8 @@ namespace Mapbox.VectorTile.Geometry
 
 					//fixup PolyNode links etc ...
 					polytree.m_Childs.Capacity = m_PolyOuts.Count;
-					for (int i = 0; i < m_PolyOuts.Count; i++)
+					polyCnt = m_PolyOuts.Count;
+					for (int i = 0; i < polyCnt; i++)
 					{
 						OutRec outRec = m_PolyOuts[i];
 						if (outRec.PolyNode == null)
@@ -3664,7 +3683,7 @@ namespace Mapbox.VectorTile.Geometry
 					outRec.BottomPt = null;
 					OutPt pp = outRec.Pts;
 					bool preserveCol = PreserveCollinear || StrictlySimple;
-					for (;;)
+					for (; ; )
 					{
 						if (pp.Prev == pp || pp.Prev == pp.Next)
 						{
@@ -4187,7 +4206,8 @@ namespace Mapbox.VectorTile.Geometry
 
 				private void JoinCommonEdges()
 				{
-					for (int i = 0; i < m_Joins.Count; i++)
+					int joinCnt = m_Joins.Count;
+					for (int i = 0; i < joinCnt; i++)
 					{
 						Join join = m_Joins[i];
 
@@ -4564,8 +4584,11 @@ namespace Mapbox.VectorTile.Geometry
 					double distance = 1.415)
 				{
 					Paths result = new Paths(polys.Count);
-					for (int i = 0; i < polys.Count; i++)
+					int polyCnt = polys.Count;
+					for (int i = 0; i < polyCnt; i++)
+					{
 						result.Add(CleanPolygon(polys[i], distance));
+					}
 					return result;
 				}
 				//------------------------------------------------------------------------------
@@ -4622,9 +4645,12 @@ namespace Mapbox.VectorTile.Geometry
 
 				private static Path TranslatePath(Path path, IntPoint delta)
 				{
-					Path outPath = new Path(path.Count);
-					for (int i = 0; i < path.Count; i++)
+					int pathCnt = path.Count;
+					Path outPath = new Path(pathCnt);
+					for (int i = 0; i < pathCnt; i++)
+					{
 						outPath.Add(new IntPoint(path[i].X + delta.X, path[i].Y + delta.Y));
+					}
 					return outPath;
 				}
 				//------------------------------------------------------------------------------
@@ -4633,7 +4659,8 @@ namespace Mapbox.VectorTile.Geometry
 				{
 					Paths solution = new Paths();
 					Clipper c = new Clipper();
-					for (int i = 0; i < paths.Count; ++i)
+					int pathCnt = paths.Count;
+					for (int i = 0; i < pathCnt; ++i)
 					{
 						Paths tmp = Minkowski(pattern, paths[i], true, pathIsClosed);
 						c.AddPaths(tmp, PolyType.ptSubject, true);

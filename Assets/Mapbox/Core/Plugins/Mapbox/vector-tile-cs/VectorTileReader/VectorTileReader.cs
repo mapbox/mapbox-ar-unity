@@ -346,12 +346,13 @@ namespace Mapbox.VectorTile
 				{
 #if NET20
 					int maxKeyIndex = -9999;
-					for (int i = 0; i < feat.Tags.Count; i += 2)
+					int tagCount = feat.Tags.Count;
+					for (int i = 0; i < tagCount; i += 2)
 					{
 						if (feat.Tags[i] > maxKeyIndex) { maxKeyIndex = feat.Tags[i]; }
 					}
 					int maxValueIndex = -9999;
-					for (int i = 1; i < feat.Tags.Count; i += 2)
+					for (int i = 1; i < tagCount; i += 2)
 					{
 						if (feat.Tags[i] > maxValueIndex) { maxValueIndex = feat.Tags[i]; }
 					}

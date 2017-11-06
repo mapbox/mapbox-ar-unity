@@ -23,10 +23,24 @@
 		[StyleSearch]
 		Style _optimizedStyle;
 
+		[NodeEditorElementAttribute("Layer Visalizers")]
 		public List<LayerVisualizerBase> Visualizers;
 
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
 		private Dictionary<UnityTile, StyleOptimizedVectorTile> _cachedData = new Dictionary<UnityTile, StyleOptimizedVectorTile>();
+
+		public string MapId
+		{
+			get
+			{
+				return _mapId;
+			}
+
+			set
+			{
+				_mapId = value;
+			}
+		}
 
 		public void OnEnable()
 		{
@@ -125,7 +139,7 @@
 					{
 						if (builder.Active)
 						{
-							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile);
+							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile, DecreaseProgressCounter);
 						}
 					}
 				}
@@ -135,6 +149,11 @@
 			Progress--;
 
 			_cachedData.Remove(tile);
+		}
+		
+		private void DecreaseProgressCounter()
+		{
+			Progress--;
 		}
 	}
 
