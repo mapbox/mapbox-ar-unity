@@ -49,7 +49,7 @@ namespace UnityEngine.XR.iOS
 			//get the config and runoption from editor and use them to initialize arkit on device
 			Application.targetFrameRate = 60;
 			m_session = UnityARSessionNativeInterface.GetARSessionNativeInterface();
-			ARKitWorldTackingSessionConfiguration config = sai.config;
+			ARKitWorldTrackingSessionConfiguration config = sai.config;
 			UnityARSessionRunOption runOptions = sai.runOption;
 			m_session.RunWithConfigAndOptions(config, runOptions);
 
