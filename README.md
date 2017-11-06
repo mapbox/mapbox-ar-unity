@@ -26,23 +26,23 @@ For additional inspiration and reference, please [see this library for iOS](http
 - [Building Occlusion](https://twitter.com/davidrhodester/status/892501191875190784)
 - [Directions](https://twitter.com/davidrhodester/status/893197138368241664)
 - Pedestrian Navigation
-![img_2641](https://user-images.githubusercontent.com/23202691/29193942-a9e3aafe-7de4-11e7-93a7-6efd877de0ad.PNG)
+  ![img_2641](https://user-images.githubusercontent.com/23202691/29193942-a9e3aafe-7de4-11e7-93a7-6efd877de0ad.PNG)
 
 ## In this Repository
 
-- [The Mapbox Unity SDK (v1.1.0)](https://github.com/mapbox/mapbox-unity-sdk)
-- Example scene to get you started: `AutomaticWorldSynchronization`
+- [The Mapbox Unity SDK (v1.2.0)](https://github.com/mapbox/mapbox-unity-sdk)
+- Example scenes to get you started: 
+  - `AutomaticWorldSynchronization`
+  - `ManualWorldSynchronization`
 - Prefabs for working with Mapbox, location, and ARKit
 - Debug utilities
 - [Unity-ARKit-Plugin](https://bitbucket.org/Unity-Technologies/unity-arkit-plugin)
-- [UnityTestTools](https://bitbucket.org/Unity-Technologies/unitytesttools/wiki/Home)
-- Unit Tests!
 
 ## Requirements
 
-- Unity v5.6.1p1+
-- iOS 11+
-- Xcode beta 9 with latest iOS SDK that contains ARKit Framework
+- Unity 2017.2+
+- iOS 11.1+
+- Xcode 9.1+
 - iOS device that supports ARKit (iPhone 6S or later, iPad (2017) or later)
 
 ## Usage
