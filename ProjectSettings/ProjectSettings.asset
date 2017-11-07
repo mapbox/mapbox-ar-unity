@@ -163,7 +163,7 @@ PlayerSettings:
   stripEngineCode: 1
   iPhoneStrippingLevel: 0
   iPhoneScriptCallOptimization: 0
-  ForceInternetPermission: 1
+  ForceInternetPermission: 0
   ForceSDCardPermission: 0
   CreateWallpaper: 0
   APKExpansionFiles: 0
@@ -235,7 +235,7 @@ PlayerSettings:
   AndroidIsGame: 1
   AndroidEnableTango: 1
   androidEnableBanner: 1
-  androidUseLowAccuracyLocation: 1
+  androidUseLowAccuracyLocation: 0
   m_AndroidBanners:
   - width: 320
     height: 180
