@@ -2,9 +2,9 @@ namespace Mapbox.Unity.Ar
 {
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Location;
+	using UnityARInterface;
 	using UnityEngine;
 	using Mapbox.Unity.Utilities;
-	using UnityEngine.XR.iOS;
 	using System;
 
 	public class SimpleAutomaticSynchronizationContextBehaviour : MonoBehaviour, ISynchronizationContext
@@ -76,14 +76,18 @@ namespace Mapbox.Unity.Ar
 			_synchronizationContext.SynchronizationBias = _synchronizationBias;
 			_synchronizationContext.OnAlignmentAvailable += SynchronizationContext_OnAlignmentAvailable;
 			_map.OnInitialized += Map_OnInitialized;
-			UnityARSessionNativeInterface.ARAnchorAddedEvent += AnchorAdded;
-			UnityARSessionNativeInterface.ARSessionTrackingChangedEvent += UnityARSessionNativeInterface_ARSessionTrackingChanged;
+
+
+			// TODO: not available in ARInterface yet?!
+			//UnityARSessionNativeInterface.ARSessionTrackingChangedEvent += UnityARSessionNativeInterface_ARSessionTrackingChanged;
+			ARInterface.planeAdded += PlaneAddedHandler;
 		}
 
 		void OnDestroy()
 		{
 			_alignmentStrategy.Unregister(this);
 			LocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
+			ARInterface.planeAdded -= PlaneAddedHandler;
 		}
 
 		void Map_OnInitialized()
@@ -94,19 +98,16 @@ namespace Mapbox.Unity.Ar
 			LocationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
 		}
 
-		// TODO: use extents of anchor to determine "floor" plane.
-		// Also, account for initial height. What happens when you walk down a hill?
-		void AnchorAdded(ARPlaneAnchor anchorData)
+		void PlaneAddedHandler(BoundedPlane plane)
 		{
-			_lastHeight = UnityARMatrixOps.GetPosition(anchorData.transform).y;
+			_lastHeight = plane.center.y;
 			Unity.Utilities.Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
 		}
 
-		// FIXME: for some reason, I never get "normal." Use caution, here.
-		void UnityARSessionNativeInterface_ARSessionTrackingChanged(UnityEngine.XR.iOS.UnityARCamera camera)
-		{
-			Unity.Utilities.Console.Instance.Log(string.Format("AR Tracking State Changed: {0}: {1}", camera.trackingState, camera.trackingReason), "silver");
-		}
+		//void UnityARSessionNativeInterface_ARSessionTrackingChanged(UnityEngine.XR.iOS.UnityARCamera camera)
+		//{
+		//	Unity.Utilities.Console.Instance.Log(string.Format("AR Tracking State Changed: {0}: {1}", camera.trackingState, camera.trackingReason), "silver");
+		//}
 
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
