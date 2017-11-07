@@ -484,6 +484,7 @@ namespace UnityEngine.XR.iOS {
 	    {
             // we only update the current camera's tracking state since that's all 
             // this cllback is for
+			s_Camera.trackingState = camera.trackingState;
             s_Camera.trackingReason = camera.trackingReason;
             if (ARSessionTrackingChangedEvent != null)
             {
