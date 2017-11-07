@@ -2,9 +2,9 @@
 {
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Location;
+	using UnityARInterface;
 	using UnityEngine;
 	using Mapbox.Unity.Utilities;
-	using UnityEngine.XR.iOS;
 	using System;
 
 	public class ManualSynchronizationContextBehaviour : MonoBehaviour, ISynchronizationContext
@@ -30,13 +30,14 @@
 		{
 			_alignmentStrategy.Register(this);
 			_map.OnInitialized += Map_OnInitialized;
-			UnityARSessionNativeInterface.ARAnchorAddedEvent += AnchorAdded;
+			ARInterface.planeAdded += PlaneAddedHandler;
 		}
 
 		void OnDestroy()
 		{
 			_alignmentStrategy.Unregister(this);
 			_locationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
+			ARInterface.planeAdded -= PlaneAddedHandler;
 		}
 
 		void Map_OnInitialized()
@@ -72,9 +73,9 @@
 			}
 		}
 
-		void AnchorAdded(ARPlaneAnchor anchorData)
+		void PlaneAddedHandler(BoundedPlane plane)
 		{
-			_lastHeight = UnityARMatrixOps.GetPosition(anchorData.transform).y;
+			_lastHeight = plane.center.y;
 			Unity.Utilities.Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
 		}
 	}

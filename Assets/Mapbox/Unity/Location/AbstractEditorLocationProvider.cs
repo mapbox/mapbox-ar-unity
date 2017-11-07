@@ -44,7 +44,8 @@
 
 		public void SendLocationEvent()
 		{
-            SendLocation(_currentLocation);
+			SetLocation();
+			SendLocation(_currentLocation);
 		}
 
 		void OnValidate()
@@ -52,7 +53,7 @@
 			if (_sendEvent)
 			{
 				_sendEvent = false;
-				SendLocation(_currentLocation);
+				SendLocationEvent();
 			}
 		}
 
