@@ -151,7 +151,7 @@ PlayerSettings:
     Android: com.mapbox.ar
     Standalone: unity.Unity Technologies.Native Rendering Plugin Example
     Tizen: com.Company.ProductName
-    iOS: com.mapbox.arkit
+    iOS: com.mapbox.ar
     tvOS: com.Company.ProductName
   buildNumber:
     iOS: 0
@@ -250,7 +250,13 @@ PlayerSettings:
       m_Width: 128
       m_Height: 128
       m_Kind: 0
-  m_BuildTargetBatching: []
+  m_BuildTargetBatching:
+  - m_BuildTarget: iPhone
+    m_StaticBatching: 1
+    m_DynamicBatching: 0
+  - m_BuildTarget: Android
+    m_StaticBatching: 1
+    m_DynamicBatching: 0
   m_BuildTargetGraphicsAPIs:
   - m_BuildTarget: AndroidPlayer
     m_APIs: 0b000000
@@ -356,8 +362,8 @@ PlayerSettings:
   enableInternalProfiler: 0
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
-  cameraUsageDescription: AR BABY
-  locationUsageDescription: LOCATION BABY
+  cameraUsageDescription: AR
+  locationUsageDescription: LOCATION
   microphoneUsageDescription: 
   switchNetLibKey: 
   switchSocketMemoryPoolSize: 6144

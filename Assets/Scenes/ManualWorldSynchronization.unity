@@ -1304,7 +1304,7 @@ MonoBehaviour:
   _autoFireEvent: 1
   _updateInterval: 0
   _sendEvent: 0
-  _latitudeLongitude: 40.039828, -105.066052
+  _latitudeLongitude: 37.7648, -122.463
   _heading: 0
 --- !u!1 &1096914012
 GameObject:
@@ -2758,3 +2758,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_camera: {fileID: 1528875962}
+  startAlignment: 0
+  planeDetection: 1
+  getPointCloud: 1
+  enableLightEstimation: 1

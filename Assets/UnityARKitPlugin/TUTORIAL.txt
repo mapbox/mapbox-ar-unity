@@ -12,7 +12,7 @@ Unity-ARKit-Plugin Step by Step
 
 6. Every update, use m_session.GetCameraProjection () to get the  ARKit understanding of the camera projection parameters and use camera.projectionMatrix to set it on the Unity camera (See UnityARCameraManager.cs)
 
-7. On the main camera for the scene, add the UnityARVideo MonoBehaviour component, and set the clear material in the inspector to point to the YUVMaterial in the project. You can look in the source at what this does:  every frame, it takes the two textures that make up the video that ARKit wants to display from the camera, and uses the YUVMaterial shader to combine them into the background that is rendered by the camera. (see UnityARVideo,cs)
+7. On the main camera for the scene, add the UnityARVideo MonoBehaviour component, and set the clear material in the inspector to point to the YUVMaterial in the project. You can look in the source at what this does:  every frame, it takes the two textures that make up the video that ARKit wants to display from the camera, and uses the YUVMaterial shader to combine them into the background that is rendered by the camera. (see UnityARVideo,cs).  In case you want to use Linear Rendering (https://docs.unity3d.com/Manual/LinearLighting.html), you can set the clear material to YUVMaterialLinear in this component.
 
 8. At this point, you should be able to place a bunch of 3D objects in the scene, build and run it and be able to see the objects you have placed and move the camera around in the scene by moving your device in the world.
 

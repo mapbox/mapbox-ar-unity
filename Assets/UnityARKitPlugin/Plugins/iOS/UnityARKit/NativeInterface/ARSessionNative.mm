@@ -49,8 +49,16 @@ typedef struct
 
 } ARKitWorldTrackingSessionConfiguration;
 
+typedef struct
+{
+    UnityARAlignment alignment;
+    uint32_t enableLightEstimation;
+    
+} ARKitFaceTrackingConfiguration;
+
 enum UnityARSessionRunOptions
 {
+    UnityARSessionRunOptionsNone = 0,
     UnityARSessionRunOptionResetTracking           = (1 << 0),
     UnityARSessionRunOptionRemoveExistingAnchors   = (1 << 1)
 
@@ -70,6 +78,25 @@ typedef struct
     void* identifier;
     UnityARMatrix4x4 transform;
 } UnityARUserAnchorData;
+
+typedef struct
+{
+    NSUInteger vertexCount;
+    float *vertices;
+    NSUInteger textureCoordinateCount;
+    float *textureCoordinates;
+    NSUInteger triangleCount;
+    int *triangleIndices;
+} UnityARFaceGeometry;
+
+typedef struct
+{
+    void *identifier;
+    UnityARMatrix4x4 transform;
+    UnityARFaceGeometry faceGeometry;
+    void *blendShapes;  //NSDictionary<ARBlendShapeLocation, NSNumber*> *
+} UnityARFaceAnchorData;
+
 
 enum UnityARTrackingState
 {
@@ -97,12 +124,38 @@ typedef struct
 
 typedef struct
 {
+    float ambientIntensity;
+    float ambientColorTemperature;
+}UnityARLightEstimation;
+
+typedef struct
+{
+    UnityARVector4 primaryLightDirectionAndIntensity;
+    float *sphericalHarmonicsCoefficients;
+}UnityARDirectionalLightEstimate;
+
+enum UnityLightDataType
+{
+    LightEstimate,
+    DirectionalLightEstimate
+};
+
+typedef struct
+{
+    UnityLightDataType arLightingType;
+    UnityARLightEstimation arLightEstimate;
+    UnityARDirectionalLightEstimate arDirectionalLightEstimate;
+}UnityLightData;
+
+typedef struct
+{
     UnityARMatrix4x4 worldTransform;
     UnityARMatrix4x4 projectionMatrix;
     UnityARTrackingState trackingState;
     UnityARTrackingReason trackingReason;
     UnityVideoParams videoParams;
-    float ambientIntensity;
+    UnityLightData lightData;
+    UnityARMatrix4x4 displayTransform;
     uint32_t getPointCloudData;
 } UnityARCamera;
 
@@ -124,6 +177,7 @@ typedef struct
 typedef void (*UNITY_AR_FRAME_CALLBACK)(UnityARCamera camera);
 typedef void (*UNITY_AR_ANCHOR_CALLBACK)(UnityARAnchorData anchorData);
 typedef void (*UNITY_AR_USER_ANCHOR_CALLBACK)(UnityARUserAnchorData anchorData);
+typedef void (*UNITY_AR_FACE_ANCHOR_CALLBACK)(UnityARFaceAnchorData anchorData);
 typedef void (*UNITY_AR_SESSION_FAILED_CALLBACK)(const void* error);
 typedef void (*UNITY_AR_SESSION_VOID_CALLBACK)(void);
 typedef void (*UNITY_AR_SESSION_TRACKING_CHANGED)(UnityARCamera camera);
@@ -208,14 +262,20 @@ inline ARSessionRunOptions GetARSessionRunOptionsFromUnityARSessionRunOptions(Un
     return ret;
 }
 
-inline void GetARSessionConfigurationFromARKitWorldTrackingSessionConfiguration(ARKitWorldTrackingSessionConfiguration& unityConfig, ARWorldTrackingSessionConfiguration* appleConfig)
+inline void GetARSessionConfigurationFromARKitWorldTrackingSessionConfiguration(ARKitWorldTrackingSessionConfiguration& unityConfig, ARWorldTrackingConfiguration* appleConfig)
 {
     appleConfig.planeDetection = GetARPlaneDetectionFromUnityARPlaneDetection(unityConfig.planeDetection);
     appleConfig.worldAlignment = GetARWorldAlignmentFromUnityARAlignment(unityConfig.alignment);
     appleConfig.lightEstimationEnabled = (BOOL)unityConfig.enableLightEstimation;
 }
 
-inline void GetARSessionConfigurationFromARKitSessionConfiguration(ARKitSessionConfiguration& unityConfig, ARSessionConfiguration* appleConfig)
+inline void GetARSessionConfigurationFromARKitSessionConfiguration(ARKitSessionConfiguration& unityConfig, ARConfiguration* appleConfig)
+{
+    appleConfig.worldAlignment = GetARWorldAlignmentFromUnityARAlignment(unityConfig.alignment);
+    appleConfig.lightEstimationEnabled = (BOOL)unityConfig.enableLightEstimation;
+}
+
+inline void GetARFaceConfigurationFromARKitFaceConfiguration(ARKitFaceTrackingConfiguration& unityConfig, ARFaceTrackingConfiguration* appleConfig)
 {
     appleConfig.worldAlignment = GetARWorldAlignmentFromUnityARAlignment(unityConfig.alignment);
     appleConfig.lightEstimationEnabled = (BOOL)unityConfig.enableLightEstimation;
@@ -252,7 +312,7 @@ inline void ARKitMatrixToUnityARMatrix4x4(const matrix_float4x4& matrixIn, Unity
 static inline void GetUnityARCameraDataFromCamera(UnityARCamera& unityARCamera, ARCamera* camera, BOOL getPointCloudData)
 {
     CGSize nativeSize = GetAppController().rootView.bounds.size;
-    matrix_float4x4 projectionMatrix = [camera projectionMatrixWithViewportSize:nativeSize orientation:[[UIApplication sharedApplication] statusBarOrientation] zNear:(CGFloat)unityCameraNearZ zFar:(CGFloat)unityCameraFarZ];
+    matrix_float4x4 projectionMatrix = [camera projectionMatrixForOrientation:[[UIApplication sharedApplication] statusBarOrientation] viewportSize:nativeSize zNear:(CGFloat)unityCameraNearZ zFar:(CGFloat)unityCameraFarZ];
     
     ARKitMatrixToUnityARMatrix4x4(projectionMatrix, &s_CameraProjectionMatrix);
     ARKitMatrixToUnityARMatrix4x4(projectionMatrix, &unityARCamera.projectionMatrix);
@@ -275,12 +335,84 @@ inline void UnityARAnchorDataFromARAnchorPtr(UnityARAnchorData& anchorData, ARPl
     anchorData.extent.z = nativeAnchor.extent.z;
 }
 
+inline void UnityARMatrix4x4FromCGAffineTransform(UnityARMatrix4x4& outMatrix, CGAffineTransform displayTransform, BOOL isLandscape)
+{
+    if (isLandscape)
+    {
+        outMatrix.column0.x = displayTransform.a;
+        outMatrix.column0.y = displayTransform.c;
+        outMatrix.column0.z = displayTransform.tx;
+        outMatrix.column1.x = displayTransform.b;
+        outMatrix.column1.y = -displayTransform.d;
+        outMatrix.column1.z = 1.0f - displayTransform.ty;
+        outMatrix.column2.z = 1.0f;
+        outMatrix.column3.w = 1.0f; 
+    }
+    else
+    {
+        outMatrix.column0.x = displayTransform.a;
+        outMatrix.column0.y = -displayTransform.c;
+        outMatrix.column0.z = -displayTransform.tx;
+        outMatrix.column1.x = displayTransform.b;
+        outMatrix.column1.y = displayTransform.d;
+        outMatrix.column1.z = displayTransform.ty;
+        outMatrix.column2.z = 1.0f;
+        outMatrix.column3.w = 1.0f;
+    }
+}
+
 inline void UnityARUserAnchorDataFromARAnchorPtr(UnityARUserAnchorData& anchorData, ARAnchor* nativeAnchor)
 {
     anchorData.identifier = (void*)[nativeAnchor.identifier.UUIDString UTF8String];
     ARKitMatrixToUnityARMatrix4x4(nativeAnchor.transform, &anchorData.transform);
 }
 
+inline void UnityARFaceGeometryFromARFaceGeometry(UnityARFaceGeometry& faceGeometry, ARFaceGeometry *arFaceGeometry)
+{
+    faceGeometry.vertexCount = arFaceGeometry.vertexCount;
+    faceGeometry.triangleCount = arFaceGeometry.triangleCount;
+    faceGeometry.textureCoordinateCount = arFaceGeometry.textureCoordinateCount;
+    faceGeometry.vertices = (float *) arFaceGeometry.vertices;
+    faceGeometry.triangleIndices = (int *) arFaceGeometry.triangleIndices;
+    faceGeometry.textureCoordinates = (float *) arFaceGeometry.textureCoordinates;
+}
+
+inline void UnityARFaceAnchorDataFromARFaceAnchorPtr(UnityARFaceAnchorData& anchorData, ARFaceAnchor* nativeAnchor)
+{
+    anchorData.identifier = (void*)[nativeAnchor.identifier.UUIDString UTF8String];
+    ARKitMatrixToUnityARMatrix4x4(nativeAnchor.transform, &anchorData.transform);
+    UnityARFaceGeometryFromARFaceGeometry(anchorData.faceGeometry, nativeAnchor.geometry);
+    anchorData.blendShapes = (__bridge void *) nativeAnchor.blendShapes;
+}
+
+inline void UnityLightDataFromARFrame(UnityLightData& lightData, ARFrame *arFrame)
+{
+    if (arFrame.lightEstimate != NULL)
+    {
+        if ([arFrame.lightEstimate class] == [ARDirectionalLightEstimate class])
+        {
+            lightData.arLightingType = DirectionalLightEstimate;
+            ARDirectionalLightEstimate *dirLightEst = (ARDirectionalLightEstimate *) arFrame.lightEstimate;
+            lightData.arDirectionalLightEstimate.sphericalHarmonicsCoefficients = (float *) dirLightEst.sphericalHarmonicsCoefficients.bytes;
+
+            //[dirLightEst.sphericalHarmonicsCoefficients getBytes:lightData.arDirectionalLightEstimate.sphericalHarmonicsCoefficients length:sizeof(float)*27 ];
+
+            UnityARVector4 dirAndIntensity;
+            dirAndIntensity.x = dirLightEst.primaryLightDirection.x;
+            dirAndIntensity.y = dirLightEst.primaryLightDirection.y;
+            dirAndIntensity.z = dirLightEst.primaryLightDirection.z;
+            dirAndIntensity.w = dirLightEst.primaryLightIntensity;
+            lightData.arDirectionalLightEstimate.primaryLightDirectionAndIntensity = dirAndIntensity;
+        }
+        else
+        {
+            lightData.arLightingType = LightEstimate;
+            lightData.arLightEstimate.ambientIntensity = arFrame.lightEstimate.ambientIntensity;
+            lightData.arLightEstimate.ambientColorTemperature = arFrame.lightEstimate.ambientColorTemperature;
+        }
+    }
+    
+}
 
 @protocol UnityARAnchorEventDispatcher
 @required
@@ -356,6 +488,41 @@ inline void UnityARUserAnchorDataFromARAnchorPtr(UnityARUserAnchorData& anchorDa
     }
 
 @end
+
+@interface UnityARFaceAnchorCallbackWrapper : NSObject <UnityARAnchorEventDispatcher>
+{
+@public
+    UNITY_AR_FACE_ANCHOR_CALLBACK _anchorAddedCallback;
+    UNITY_AR_FACE_ANCHOR_CALLBACK _anchorUpdatedCallback;
+    UNITY_AR_FACE_ANCHOR_CALLBACK _anchorRemovedCallback;
+}
+@end
+
+@implementation UnityARFaceAnchorCallbackWrapper
+
+-(void)sendAnchorAddedEvent:(ARAnchor*)anchor
+{
+    UnityARFaceAnchorData data;
+    UnityARFaceAnchorDataFromARFaceAnchorPtr(data, (ARFaceAnchor*)anchor);
+    _anchorAddedCallback(data);
+}
+
+-(void)sendAnchorRemovedEvent:(ARAnchor*)anchor
+{
+    UnityARFaceAnchorData data;
+    UnityARFaceAnchorDataFromARFaceAnchorPtr(data, (ARFaceAnchor*)anchor);
+    _anchorRemovedCallback(data);
+}
+
+-(void)sendAnchorUpdatedEvent:(ARAnchor*)anchor
+{
+    UnityARFaceAnchorData data;
+    UnityARFaceAnchorDataFromARFaceAnchorPtr(data, (ARFaceAnchor*)anchor);
+    _anchorUpdatedCallback(data);
+}
+
+@end
+
 static UnityPixelBuffer s_UnityPixelBuffers;
 
 @interface UnityARSession : NSObject <ARSessionDelegate>
@@ -413,10 +580,8 @@ static CGAffineTransform s_CurAffineTransform;
 
     CGRect nativeBounds = [[UIScreen mainScreen] nativeBounds];
     CGSize nativeSize = GetAppController().rootView.bounds.size;
-
-    matrix_float4x4 projectionMatrix = [frame.camera projectionMatrixWithViewportSize:nativeSize orientation:[[UIApplication sharedApplication] statusBarOrientation] zNear:(CGFloat)unityCameraNearZ zFar:(CGFloat)unityCameraFarZ];
-
-    s_CurAffineTransform = [frame displayTransformWithViewportSize:nativeSize orientation:[[UIApplication sharedApplication] statusBarOrientation]];
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    s_CurAffineTransform = CGAffineTransformInvert([frame displayTransformForOrientation:orientation viewportSize:nativeSize]);
 
     UnityARCamera unityARCamera;
 
@@ -433,12 +598,15 @@ static CGAffineTransform s_CurAffineTransform;
     unityARCamera.videoParams.texCoordScale =  screenAspect / imageAspect;
     s_ShaderScale = screenAspect / imageAspect;
     
-    unityARCamera.ambientIntensity = frame.lightEstimate.ambientIntensity;
-    
-    unityARCamera.videoParams.yWidth = imageWidth;
-    unityARCamera.videoParams.yHeight = imageHeight;
+    UnityLightDataFromARFrame(unityARCamera.lightData, frame);
+
+    unityARCamera.videoParams.yWidth = (uint32_t)imageWidth;
+    unityARCamera.videoParams.yHeight = (uint32_t)imageHeight;
     unityARCamera.videoParams.cvPixelBufferPtr = (void *) pixelBuffer;
-    
+    UnityARMatrix4x4 displayTransform;
+    memset(&displayTransform, 0, sizeof(UnityARMatrix4x4));
+    UnityARMatrix4x4FromCGAffineTransform(displayTransform, s_CurAffineTransform, UIInterfaceOrientationIsLandscape(orientation));
+    unityARCamera.displayTransform = displayTransform;
 
     if (_frameCallback != NULL)
     {
@@ -496,13 +664,13 @@ static CGAffineTransform s_CurAffineTransform;
         
         if (s_UnityPixelBuffers.pYPixelBytes)
         {
-            uint32_t numBytes = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 0) * CVPixelBufferGetHeightOfPlane(pixelBuffer,0);
+            unsigned long numBytes = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 0) * CVPixelBufferGetHeightOfPlane(pixelBuffer,0);
             void* baseAddress = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer,0);
             memcpy(s_UnityPixelBuffers.pYPixelBytes, baseAddress, numBytes);
         }
         if (s_UnityPixelBuffers.pUVPixelBytes)
         {
-            uint32_t numBytes = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 1) * CVPixelBufferGetHeightOfPlane(pixelBuffer,1);
+            unsigned long numBytes = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 1) * CVPixelBufferGetHeightOfPlane(pixelBuffer,1);
             void* baseAddress = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer,1);
             memcpy(s_UnityPixelBuffers.pUVPixelBytes, baseAddress, numBytes);
         }
@@ -683,10 +851,22 @@ extern "C" void session_SetUserAnchorCallbacks(const void* session, UNITY_AR_USE
     [nativeSession->_classToCallbackMap setObject:userAnchorCallbacks forKey:[ARAnchor class]];
 }
 
+extern "C" void session_SetFaceAnchorCallbacks(const void* session, UNITY_AR_FACE_ANCHOR_CALLBACK faceAnchorAddedCallback,
+                                               UNITY_AR_FACE_ANCHOR_CALLBACK faceAnchorUpdatedCallback,
+                                               UNITY_AR_FACE_ANCHOR_CALLBACK faceAnchorRemovedCallback)
+{
+    UnityARSession* nativeSession = (__bridge UnityARSession*)session;
+    UnityARFaceAnchorCallbackWrapper* faceAnchorCallbacks = [[UnityARFaceAnchorCallbackWrapper alloc] init];
+    faceAnchorCallbacks->_anchorAddedCallback = faceAnchorAddedCallback;
+    faceAnchorCallbacks->_anchorUpdatedCallback = faceAnchorUpdatedCallback;
+    faceAnchorCallbacks->_anchorRemovedCallback = faceAnchorRemovedCallback;
+    [nativeSession->_classToCallbackMap setObject:faceAnchorCallbacks forKey:[ARFaceAnchor class]];
+}
+
 extern "C" void StartWorldTrackingSessionWithOptions(void* nativeSession, ARKitWorldTrackingSessionConfiguration unityConfig, UnityARSessionRunOptions runOptions)
 {
     UnityARSession* session = (__bridge UnityARSession*)nativeSession;
-    ARWorldTrackingSessionConfiguration* config = [ARWorldTrackingSessionConfiguration new];
+    ARWorldTrackingConfiguration* config = [ARWorldTrackingConfiguration new];
     ARSessionRunOptions runOpts = GetARSessionRunOptionsFromUnityARSessionRunOptions(runOptions);
     GetARSessionConfigurationFromARKitWorldTrackingSessionConfiguration(unityConfig, config);
     session->_getPointCloudData = (BOOL) unityConfig.getPointCloudData;
@@ -699,7 +879,7 @@ extern "C" void StartWorldTrackingSessionWithOptions(void* nativeSession, ARKitW
 extern "C" void StartWorldTrackingSession(void* nativeSession, ARKitWorldTrackingSessionConfiguration unityConfig)
 {
     UnityARSession* session = (__bridge UnityARSession*)nativeSession;
-    ARWorldTrackingSessionConfiguration* config = [ARWorldTrackingSessionConfiguration new];
+    ARWorldTrackingConfiguration* config = [ARWorldTrackingConfiguration new];
     GetARSessionConfigurationFromARKitWorldTrackingSessionConfiguration(unityConfig, config);
     session->_getPointCloudData = (BOOL) unityConfig.getPointCloudData;
     [session->_session runWithConfiguration:config];
@@ -709,7 +889,7 @@ extern "C" void StartWorldTrackingSession(void* nativeSession, ARKitWorldTrackin
 extern "C" void StartSessionWithOptions(void* nativeSession, ARKitSessionConfiguration unityConfig, UnityARSessionRunOptions runOptions)
 {
     UnityARSession* session = (__bridge UnityARSession*)nativeSession;
-    ARSessionConfiguration* config = [ARSessionConfiguration new];
+    ARConfiguration* config = [AROrientationTrackingConfiguration new];
     ARSessionRunOptions runOpts = GetARSessionRunOptionsFromUnityARSessionRunOptions(runOptions);
     GetARSessionConfigurationFromARKitSessionConfiguration(unityConfig, config);
     session->_getPointCloudData = (BOOL) unityConfig.getPointCloudData;
@@ -722,11 +902,26 @@ extern "C" void StartSessionWithOptions(void* nativeSession, ARKitSessionConfigu
 extern "C" void StartSession(void* nativeSession, ARKitSessionConfiguration unityConfig)
 {
     UnityARSession* session = (__bridge UnityARSession*)nativeSession;
-    ARSessionConfiguration* config = [ARSessionConfiguration new];
+    ARConfiguration* config = [AROrientationTrackingConfiguration new];
     GetARSessionConfigurationFromARKitSessionConfiguration(unityConfig, config);
     session->_getPointCloudData = (BOOL) unityConfig.getPointCloudData;
     [session->_session runWithConfiguration:config];
     [session setupMetal];
+}
+
+extern "C" void StartFaceTrackingSessionWithOptions(void* nativeSession, ARKitFaceTrackingConfiguration unityConfig, UnityARSessionRunOptions runOptions)
+{
+    UnityARSession* session = (__bridge UnityARSession*)nativeSession;
+    ARFaceTrackingConfiguration* config = [ARFaceTrackingConfiguration new];
+    ARSessionRunOptions runOpts = GetARSessionRunOptionsFromUnityARSessionRunOptions(runOptions);
+    GetARFaceConfigurationFromARKitFaceConfiguration(unityConfig, config);
+    [session->_session runWithConfiguration:config options:runOpts ];
+    [session setupMetal];
+}
+
+extern "C" void StartFaceTrackingSession(void* nativeSession, ARKitFaceTrackingConfiguration unityConfig)
+{
+    StartFaceTrackingSessionWithOptions(nativeSession, unityConfig, UnityARSessionRunOptionsNone);
 }
 
 extern "C" void PauseSession(void* nativeSession)
@@ -820,9 +1015,8 @@ static NSArray<ARHitTestResult *>* s_LastHitTestResults;
 extern "C" int HitTest(void* nativeSession, CGPoint point, ARHitTestResultType types)
 {
     UnityARSession* session = (__bridge UnityARSession*)nativeSession;
-
-     point = CGPointApplyAffineTransform(CGPointMake(point.x, 1.0f - point.y), CGAffineTransformInvert(s_CurAffineTransform));
-     s_LastHitTestResults = [session->_session.currentFrame hitTest:point types:types];
+    point = CGPointApplyAffineTransform(CGPointMake(point.x, 1.0f - point.y), CGAffineTransformInvert(CGAffineTransformInvert(s_CurAffineTransform)));
+    s_LastHitTestResults = [session->_session.currentFrame hitTest:point types:types];
 
     return (int)[s_LastHitTestResults count];
 }
@@ -876,17 +1070,29 @@ extern "C" int GetTrackingQuality()
     return s_TrackingQuality;
 }
 
-extern "C" float GetYUVTexCoordScale()
-{
-    return s_ShaderScale;
-}
-
 extern "C" bool IsARKitWorldTrackingSessionConfigurationSupported()
 {
-    return ARWorldTrackingSessionConfiguration.isSupported;
+    return ARWorldTrackingConfiguration.isSupported;
 }
 
 extern "C" bool IsARKitSessionConfigurationSupported()
 {
-    return ARSessionConfiguration.isSupported;
+    return AROrientationTrackingConfiguration.isSupported;
+}
+
+extern "C" bool IsARKitFaceTrackingConfigurationSupported()
+{
+    return ARFaceTrackingConfiguration.isSupported;
+}
+
+extern "C" void GetBlendShapesInfo(void* ptrDictionary, void (*visitorFn)(const char* key, const float value))
+{
+    // Get your NSDictionary
+    NSDictionary<ARBlendShapeLocation, NSNumber*> * dictionary = (__bridge NSDictionary<ARBlendShapeLocation, NSNumber*> *) ptrDictionary;
+    
+    for(NSString* key in dictionary)
+    {
+        NSNumber* value = [dictionary objectForKey:key];
+        visitorFn([key UTF8String], [value floatValue]);
+    }
 }
