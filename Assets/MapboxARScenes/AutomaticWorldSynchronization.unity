@@ -112,6 +112,16 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!4 &28648316 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4518919239272552, guid: 35e76f6e52f5c4252a0b703cc2019a37,
+    type: 2}
+  m_PrefabInternal: {fileID: 1906626083}
+--- !u!4 &1555340516 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4109583870412416, guid: 35e76f6e52f5c4252a0b703cc2019a37,
+    type: 2}
+  m_PrefabInternal: {fileID: 1906626083}
 --- !u!1001 &1680096571
 Prefab:
   m_ObjectHideFlags: 0
@@ -206,12 +216,12 @@ Prefab:
     - target: {fileID: 224896736793240350, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 116.5
+      value: 650
       objectReference: {fileID: 0}
     - target: {fileID: 224896736793240350, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: m_LocalPosition.y
-      value: 207
+      value: 240
       objectReference: {fileID: 0}
     - target: {fileID: 224409009942014400, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
@@ -247,6 +257,32 @@ Prefab:
         type: 2}
       propertyPath: m_LocalPosition.y
       value: -960
+      objectReference: {fileID: 0}
+    - target: {fileID: 114483648178907214, guid: 35e76f6e52f5c4252a0b703cc2019a37,
+        type: 2}
+      propertyPath: _root
+      value: 
+      objectReference: {fileID: 28648316}
+    - target: {fileID: 114020511733235004, guid: 35e76f6e52f5c4252a0b703cc2019a37,
+        type: 2}
+      propertyPath: _arPositionReference
+      value: 
+      objectReference: {fileID: 1555340516}
+    - target: {fileID: 114483648178907214, guid: 35e76f6e52f5c4252a0b703cc2019a37,
+        type: 2}
+      propertyPath: _mapVisualizer
+      value: 
+      objectReference: {fileID: 11400000, guid: 5c78f162127f44067883454c4f8e174e,
+        type: 2}
+    - target: {fileID: 114483648178907214, guid: 35e76f6e52f5c4252a0b703cc2019a37,
+        type: 2}
+      propertyPath: _initializeOnStart
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114194964888021804, guid: 35e76f6e52f5c4252a0b703cc2019a37,
+        type: 2}
+      propertyPath: _latitudeLongitude
+      value: 40.7825, -73.966111111111
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 35e76f6e52f5c4252a0b703cc2019a37, type: 2}
