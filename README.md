@@ -30,13 +30,17 @@ For additional inspiration and reference, please [see this library for iOS](http
 
 ## In this Repository
 
-- [The Mapbox Unity SDK (v1.2.0)](https://github.com/mapbox/mapbox-unity-sdk)
+- [The Mapbox Unity SDK (v1.2.0 taken from `develop`)](https://github.com/mapbox/mapbox-unity-sdk)
 - Example scenes to get you started: 
   - `AutomaticWorldSynchronization`
   - `ManualWorldSynchronization`
 - Prefabs for working with Mapbox, location, and ARKit
 - Debug utilities
-- [Unity-ARKit-Plugin](https://bitbucket.org/Unity-Technologies/unity-arkit-plugin)
+- [Unity ARInterface](https://github.com/Unity-Technologies/experimental-ARInterface)
+  - Unity ARKit plugin
+  - Google ARCore plugin
+  - ARInterface
+
 
 ## Requirements
 
@@ -44,6 +48,14 @@ For additional inspiration and reference, please [see this library for iOS](http
 - iOS 11.1+
 - Xcode 9.1+
 - iOS device that supports ARKit (iPhone 6S or later, iPad (2017) or later)
+- Android device that supports ARCore
+
+## Known Issues
+
+- Location permissions on Android must be enabled manually after installing application! [See here for related information](https://github.com/google-ar/arcore-unity-sdk/issues/14#issuecomment-330403879).
+- Debug paths are not rendering on Android
+- AR Tracking state is not yet exposed in the ARInterface
+- Focus square has rendering issues on Android
 
 ## Usage
 
