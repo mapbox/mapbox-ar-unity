@@ -1,8 +1,8 @@
 
 ![plus-unity_city markers](https://user-images.githubusercontent.com/12749701/29585661-cfa223ae-873c-11e7-8d62-48024d759cdb.png)
 
-# Mapbox Unity SDK + ARKit For World-scale AR Experiences
-A place to create/learn with Unity, ARKit, and Mapbox!
+# Mapbox Unity SDK + ARKit + ARCore For World-scale AR Experiences
+A place to create/learn with Unity, ARKit/ARCore and Mapbox!
 
 **Note: This library is experimental and will change. It is published to gather feedback from the community. Please use with caution and open issues for any problems you see or missing features that should be added.**
 
@@ -11,6 +11,8 @@ We'd love to have you [contribute](CONTRIBUTING.md) to the project!
 Also, see our related [iOS library](https://github.com/mapbox/mapbox-arkit-ios).
 
 ## What is it?
+
+Check out [this presentation](https://youtu.be/vRmTn25xm7Q) for reference.
 
 One limitation of ARKit is that it does not have any knowledge of where in the world a session was started (or ended), nor does it know the True North alignment with the real world. ARKit is great for location positional tracking, but suffers over distance, or when tracking is poor. My testing has shown that ARKit's position begins to drift after just a few meters and becomes very noticeable after 50 meters (average accumulated drift ~10 meters with GPS accuracy 5 meters).
 
@@ -25,8 +27,7 @@ For additional inspiration and reference, please [see this library for iOS](http
 - [Using maps and location services with ARKit](https://blog.mapbox.com/using-maps-and-location-services-with-arkit-a1980903ca96) (iOS)
 - [Building Occlusion](https://twitter.com/davidrhodester/status/892501191875190784)
 - [Directions](https://twitter.com/davidrhodester/status/893197138368241664)
-- Pedestrian Navigation
-  ![img_2641](https://user-images.githubusercontent.com/23202691/29193942-a9e3aafe-7de4-11e7-93a7-6efd877de0ad.PNG)
+- [Pedestrian Navigation](https://youtu.be/vRmTn25xm7Q)
 
 ## In this Repository
 
@@ -155,11 +156,9 @@ You will need to experiment with various `DesiredAccuracyInMeters` and `UpdateDi
 
 ## Limitations
 
-This has been developed with TDD (see `SimpleAutomaticSynchronizationContextTests`). However, these tests are quite limited and do not yet fully encapsulate the different scenarios which will inevitably arise in reality. Additionally, while I have done extensive testing "on the ground," I've been in limited, specific locations, with ideal GPS accuracy. I make no guarantees that what is currently provided in this library will solve your problems or work in your area (please help me make it better).
+While I have done extensive testing "on the ground," I've been in limited, specific locations, with ideal GPS accuracy. I make no guarantees that what is currently provided in this library will solve your problems or work in your area (please help me make it better).
 
 There are various `TODO` and `FIXME` tasks scattered around in the `Mapbox.Unity.Ar` namespace. Please take a look at these to get a better idea of where I think there are some shortcomings. In general, my implementation so far is quite naive. Hopefully the community can help improve this with new context implementations or more sophisticated algorithms/filters.
-
-There are some ignored tests in `SimpleAutomaticSynchronizationContextTests` that suggest potential issues with the initial implementation. Some of these are (wrongly) addressed with the `AverageHeadingAlignmentStrategy`, but should be moved to the context.
 
 Solving for UX is not an easy matter. Manual calibration works great, but is not user-friendly (or immune to human error). Automatic calibration works, but still has shortcomings, such as requiring the user to walk *x* meters before acquiring a workable alignment.
 
