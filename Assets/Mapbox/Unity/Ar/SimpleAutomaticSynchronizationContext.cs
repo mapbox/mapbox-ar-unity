@@ -26,8 +26,8 @@
 		Vector3 _currentArVector;
 		Vector3 _currentAbsoluteGpsVector;
 
-        Vector3 _previousArVector;
-        Vector3 _previousAbsoluteGpsVector;
+		Vector3 _previousArNode;
+		Vector3 _previousLocationPosition;
 
 		/// <summary>
 		/// The synchronization bias.
@@ -77,8 +77,8 @@
 			_count = _arNodes.Count;
 			if (_count > 1)
 			{
-				_currentArVector = arNode - _previousArVector;
-				_currentAbsoluteGpsVector = locationPosition - _previousAbsoluteGpsVector;
+				_currentArVector = arNode - _previousArNode;
+				_currentAbsoluteGpsVector = locationPosition - _previousLocationPosition;
 
 				// TODO: try to use ArTrustRange instead!
 				// This would mean no alignment is calculated until the threshold is met.
@@ -86,20 +86,21 @@
 				if (_currentArVector.magnitude < MinimumDeltaDistance || _currentAbsoluteGpsVector.magnitude < MinimumDeltaDistance)
 				{
 					Unity.Utilities.Console.Instance.Log("Minimum movement not yet met (arDelta: "+ _currentArVector.magnitude + ", gpsDelta: "+ _currentAbsoluteGpsVector.magnitude + ")", "red");
-                    return;
+					return;
 				}
 
 				ComputeAlignment();
 
-                _previousArVector = _currentArVector;
-                _previousAbsoluteGpsVector = _currentAbsoluteGpsVector;
-            }
-            else
-            {
-                //Initialize previous AR / GPS vectors
-                _previousArVector = arNode;
-                _previousAbsoluteGpsVector = locationPosition;
-            }
+				//Compute next alignment relative to current location.
+				_previousArNode = arNode;
+				_previousLocationPosition = locationPosition;
+			}
+			else
+			{
+				//Initialize previous AR / GPS vectors
+				_previousArNode = arNode;
+				_previousLocationPosition = locationPosition;
+			}
 		}
 
 		void ComputeAlignment()
@@ -124,8 +125,8 @@
 				bias = Mathf.Clamp01((.5f * (deltaDistance + ArTrustRange - accuracy)) / deltaDistance);
 			}
 
-            // Our new "origin" will be the difference offset between our last nodes (mapped into the same coordinate space).
-            var originOffset = _previousArVector - headingQuaternion * _previousAbsoluteGpsVector;
+			// Our new "origin" will be the difference offset between our last nodes (mapped into the same coordinate space).
+			var originOffset = _previousArNode - headingQuaternion * _previousLocationPosition;
 
 			// Add the weighted delta.
 			_position = (delta * bias) + originOffset;
