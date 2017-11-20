@@ -21,12 +21,13 @@
 		List<Vector3> _gpsPositions = new List<Vector3>();
 		List<Vector3> _arNodes = new List<Vector3>();
 
-		float _arDelta;
-		float _gpsDelta;
 		int _count;
 
 		Vector3 _currentArVector;
 		Vector3 _currentAbsoluteGpsVector;
+
+		Vector3 _previousArNode;
+		Vector3 _previousLocationPosition;
 
 		/// <summary>
 		/// The synchronization bias.
@@ -76,25 +77,29 @@
 			_count = _arNodes.Count;
 			if (_count > 1)
 			{
-				_currentArVector = _arNodes[_count - 1] - _arNodes[_count - 2];
-				_currentAbsoluteGpsVector = _gpsPositions[_count - 1] - _gpsPositions[_count - 2];
-
-				//TODO: optimize with sqmag?
-				_arDelta += _currentArVector.magnitude;
-				_gpsDelta += _currentAbsoluteGpsVector.magnitude;
+				_currentArVector = arNode - _previousArNode;
+				_currentAbsoluteGpsVector = locationPosition - _previousLocationPosition;
 
 				// TODO: try to use ArTrustRange instead!
 				// This would mean no alignment is calculated until the threshold is met.
 				// Perhaps more drift, but also more stable?
-				if (_arDelta < MinimumDeltaDistance || _gpsDelta < MinimumDeltaDistance)
+				if (_currentArVector.magnitude < MinimumDeltaDistance || _currentAbsoluteGpsVector.magnitude < MinimumDeltaDistance)
 				{
-					Unity.Utilities.Console.Instance.Log("Minimum movement not yet met!", "red");
+					Unity.Utilities.Console.Instance.Log("Minimum movement not yet met (arDelta: "+ _currentArVector.magnitude + ", gpsDelta: "+ _currentAbsoluteGpsVector.magnitude + ")", "red");
 					return;
 				}
 
-				_arDelta = 0f;
-				_gpsDelta = 0f;
 				ComputeAlignment();
+
+				//Compute next alignment relative to current location.
+				_previousArNode = arNode;
+				_previousLocationPosition = locationPosition;
+			}
+			else
+			{
+				//Initialize previous AR / GPS vectors
+				_previousArNode = arNode;
+				_previousLocationPosition = locationPosition;
 			}
 		}
 
@@ -121,7 +126,7 @@
 			}
 
 			// Our new "origin" will be the difference offset between our last nodes (mapped into the same coordinate space).
-			var originOffset = _arNodes[_count - 2] - headingQuaternion * _gpsPositions[_count - 2];
+			var originOffset = _previousArNode - headingQuaternion * _previousLocationPosition;
 
 			// Add the weighted delta.
 			_position = (delta * bias) + originOffset;
