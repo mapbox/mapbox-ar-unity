@@ -14,6 +14,8 @@ Also, see our related [iOS library](https://github.com/mapbox/mapbox-arkit-ios).
 
 Check out [this presentation](https://youtu.be/vRmTn25xm7Q) for reference.
 
+## ARKit specific checks
+
 One limitation of ARKit is that it does not have any knowledge of where in the world a session was started (or ended), nor does it know the True North alignment with the real world. ARKit is great for location positional tracking, but suffers over distance, or when tracking is poor. My testing has shown that ARKit's position begins to drift after just a few meters and becomes very noticeable after 50 meters (average accumulated drift ~10 meters with GPS accuracy 5 meters).
 
 This project aims to inform ARKit of global positioning using location data from the phone, which will enable Unity developers to "anchor" augmented reality experiences to real world coordinates. Given the sheer volume of data that [Mapbox](http://www.mapbox.com) provides, the possibilities are endless.
