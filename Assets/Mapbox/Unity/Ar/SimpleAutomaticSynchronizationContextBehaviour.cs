@@ -29,7 +29,10 @@ namespace Mapbox.Unity.Ar
 
 		[SerializeField]
 		float _minimumDeltaDistance = 2f;
-
+                
+		[SerializeField]
+                float _minimumDesiredAccuracy = 5f;
+                
 		SimpleAutomaticSynchronizationContext _synchronizationContext;
 
 		float _lastHeading;
@@ -112,7 +115,7 @@ namespace Mapbox.Unity.Ar
 		{
 			if (location.IsLocationUpdated)
 			{      
-			        if (location.Accuracy < 4.5) //With this line, we can control accuracy of Gps updates. 
+			        if (location.Accuracy <  _minimumDesiredAccuracy) //With this line, we can control accuracy of Gps updates. 
 				{
 				   var latitudeLongitude = location.LatitudeLongitude;
 				   Unity.Utilities.Console.Instance.Log(string.Format("Location: {0},{1}\tAccuracy: {2}\tHeading: {3}",
