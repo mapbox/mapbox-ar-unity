@@ -23,7 +23,7 @@ This project aims to inform ARKit of global positioning using location data from
 
 For additional inspiration and reference, please [see this library for iOS](https://github.com/ProjectDent/ARKit-CoreLocation). Concepts and potential solutions should be similar, though implementation will vary greatly.
 
-*Please note: while it is possible to use Mapbox to display 3D maps on your coffee table, this project is aimed at building "world-scale" maps and augmented reality experiences.*
+*Please note: while it is possible to use Mapbox to display 3D maps on your coffee table, this project is aimed at building "world scale" maps and augmented reality experiences.*
 
 #### Examples
 
