@@ -2,7 +2,7 @@
 ![unity-repo-banner_preview](https://user-images.githubusercontent.com/4824060/34123144-9a78d322-e3fc-11e7-936f-d5e526ca8520.png)
 
 
-# Mapbox Unity SDK + ARKit + ARCore For World-scale AR Experiences
+# Mapbox Unity SDK + ARKit + ARCore For World Scale AR Experiences
 A place to create/learn with Unity, ARKit/ARCore and Mapbox!
 
 **Note: This library is experimental and will change. It is published to gather feedback from the community. Please use with caution and open issues for any problems you see or missing features that should be added.**
@@ -34,7 +34,7 @@ For additional inspiration and reference, please [see this library for iOS](http
 
 ## In this Repository
 
-- [The Mapbox Unity SDK (v1.2.0 taken from `develop`)](https://github.com/mapbox/mapbox-unity-sdk)
+- [The Mapbox Unity SDK (v1.3.0 taken from `develop`)](https://github.com/mapbox/mapbox-unity-sdk)
 - Example scenes to get you started: 
   - `AutomaticWorldSynchronization`
   - `ManualWorldSynchronization`
@@ -52,7 +52,7 @@ For additional inspiration and reference, please [see this library for iOS](http
 - iOS 11.1+
 - Xcode 9.1+
 - iOS device that supports ARKit (iPhone 6S or later, iPad (2017) or later)
-- Android device that supports ARCore
+- Android device that [supports ARCore](https://developers.google.com/ar/discover/) (Google Pixel, Pixel XL, Pixel 2, Pixel 2 XL, Samsung Galaxy S8)
 
 ## Known Issues
 
