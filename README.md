@@ -1,5 +1,6 @@
 
-![plus-unity_city markers](https://user-images.githubusercontent.com/12749701/29585661-cfa223ae-873c-11e7-8d62-48024d759cdb.png)
+![unity-repo-banner_preview](https://user-images.githubusercontent.com/4824060/34123144-9a78d322-e3fc-11e7-936f-d5e526ca8520.png)
+
 
 # Mapbox Unity SDK + ARKit + ARCore For World-scale AR Experiences
 A place to create/learn with Unity, ARKit/ARCore and Mapbox!
