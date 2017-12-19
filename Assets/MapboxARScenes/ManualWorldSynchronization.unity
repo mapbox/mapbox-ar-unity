@@ -220,7 +220,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 368533104}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 640, y: -0.00012207031, z: 0}
+  m_LocalPosition: {x: 1803.3419, y: -0.00012207031, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1628664947}
@@ -1254,7 +1254,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 958232415}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -620, y: -940, z: 0}
+  m_LocalPosition: {x: -1783.3419, y: -940.00006, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1096914013}
@@ -1474,7 +1474,8 @@ MonoBehaviour:
   _updateInterval: 0
   _sendEvent: 0
   _latitudeLongitude: 37.7648, -122.463
-  _heading: 0
+  _targetTransform: {fileID: 0}
+  _map: {fileID: 1641695513}
 --- !u!1 &1096914012
 GameObject:
   m_ObjectHideFlags: 0
@@ -1503,8 +1504,8 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1096914012}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 276, y: 414, z: 0}
-  m_LocalScale: {x: 0.43125, y: 0.43125, z: 0.43125}
+  m_LocalPosition: {x: 371, y: 197.5, z: 0}
+  m_LocalScale: {x: 0.20572916, y: 0.20572916, z: 0.20572916}
   m_Children:
   - {fileID: 1626994447}
   - {fileID: 1695685414}
@@ -1621,7 +1622,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1199727646}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -590, y: 910, z: 0}
+  m_LocalPosition: {x: -1753.3419, y: 910.00006, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 516944613}
@@ -1986,6 +1987,7 @@ MonoBehaviour:
   _deviceLocationProvider: {fileID: 1518313086}
   _editorLocationProvider: {fileID: 1018080088}
   _transformLocationProvider: {fileID: 655680001}
+  _dontDestroyOnLoad: 0
 --- !u!1 &1561879294
 GameObject:
   m_ObjectHideFlags: 0
@@ -2087,7 +2089,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1626994446}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 620, y: -960, z: 0}
+  m_LocalPosition: {x: 1783.3419, y: -960.00006, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1733870902}
@@ -2308,9 +2310,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcbec1ed7768a40ea93d476c23a129c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _zoom: 18
   _initializeOnStart: 0
   _latitudeLongitudeString: 0,0
-  _zoom: 18
   _root: {fileID: 0}
   _tileProvider: {fileID: 1641695509}
   _mapVisualizer: {fileID: 11400000, guid: 5c78f162127f44067883454c4f8e174e, type: 2}
