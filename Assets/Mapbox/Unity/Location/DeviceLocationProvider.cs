@@ -26,8 +26,6 @@ namespace Mapbox.Unity.Location
 		[SerializeField]
 		float _updateDistanceInMeters = 5f;
 
-		Location _currentLocation;
-
 		Coroutine _pollRoutine;
 
 		double _lastLocationTimestamp;
@@ -53,8 +51,12 @@ namespace Mapbox.Unity.Location
 		/// <returns>The location routine.</returns>
 		IEnumerator PollLocationRoutine()
 		{
+#if UNITY_EDITOR
+			yield return new WaitWhile(() => !UnityEditor.EditorApplication.isRemoteConnected);
+#endif
 			if (!Input.location.isEnabledByUser)
 			{
+				Debug.LogError("DeviceLocationProvider: " + "Location is not enabled by user!");
 				yield break;
 			}
 
@@ -70,14 +72,21 @@ namespace Mapbox.Unity.Location
 
 			if (maxWait < 1)
 			{
+				Debug.LogError("DeviceLocationProvider: " + "Timed out trying to initialize location services!");
 				yield break;
 			}
 
 			if (Input.location.status == LocationServiceStatus.Failed)
 			{
+				Debug.LogError("DeviceLocationProvider: " + "Failed to initialize location services!");
 				yield break;
 			}
 
+#if UNITY_EDITOR
+			// HACK: this is to prevent Android devices, connected through Unity Remote, 
+			// from reporting a location of (0, 0), initially.
+			yield return _wait;
+#endif
 			while (true)
 			{
 				_currentLocation.IsHeadingUpdated = false;
@@ -89,6 +98,7 @@ namespace Mapbox.Unity.Location
 					var heading = Input.compass.trueHeading;
 					_currentLocation.Heading = heading;
 					_lastHeadingTimestamp = timestamp;
+
 					_currentLocation.IsHeadingUpdated = true;
 				}
 
@@ -98,12 +108,17 @@ namespace Mapbox.Unity.Location
 				{
 					_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
 					_currentLocation.Accuracy = (int)lastData.horizontalAccuracy;
-					_currentLocation.IsLocationUpdated = true;
 					_currentLocation.Timestamp = timestamp;
 					_lastLocationTimestamp = timestamp;
+
+					_currentLocation.IsLocationUpdated = true;
 				}
 
-				SendLocation(_currentLocation);
+				if (_currentLocation.IsHeadingUpdated || _currentLocation.IsLocationUpdated)
+				{
+					SendLocation(_currentLocation);
+				}
+
 				yield return null;
 			}
 		}
