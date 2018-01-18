@@ -5,7 +5,7 @@ using Mapbox.Map;
 namespace Mapbox.Unity.Map
 {
     
-	public class ARTableTileProvider : AbstractTileProvider
+    public class ARTableTileProvider : AbstractTileProvider
 	{
 
         [SerializeField]

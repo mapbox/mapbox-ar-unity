@@ -11,7 +11,7 @@ public class PlaceMapOnARPlane : MonoBehaviour
     {
         ARPlaneHandler.returnARPlane += PlaceMap;
         ARPlaneHandler.resetARPlane += ResetPlane;
-	}
+    }
 
     void PlaceMap(BoundedPlane plane)
     {
@@ -32,5 +32,4 @@ public class PlaceMapOnARPlane : MonoBehaviour
     {
         ARPlaneHandler.returnARPlane -= PlaceMap;
     }
-
 }
