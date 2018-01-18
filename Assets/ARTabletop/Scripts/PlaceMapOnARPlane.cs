@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityARInterface;
 
-public class PlaceMapOnARPlane : MonoBehaviour {
+public class PlaceMapOnARPlane : MonoBehaviour 
+{
 
     [SerializeField]
-    Transform _mapTransform;
+    private Transform _mapTransform;
 
 	// Use this for initialization
 	void Start () 

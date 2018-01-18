@@ -25,12 +25,11 @@
 
 // clips any pixel in an area defined by size, rotation, and position
 
-Shader "Clip/Box" {
-	Properties {
+Shader "Clip/Box" 
+{
+	Properties 
+    {
     
-      //_BoxSize ("Box Size (World Space)", Vector) = (1,1,1,1)
-      //_BoxRotation("Box Rotation (Euler xyz)", Vector) = (0,0,0,1)
-      //_Origin ("Origin (World Space)", Vector) = (0,0,0,0)
       _ConvertEmission ("Convert Emission", Range(0,1)) = 0.5
       _ConvertDistance ("Conversion Distance", float) = 0.1
       _Conversion ("Conversion (RGB)", 2D) = "white" {}
@@ -41,7 +40,8 @@ Shader "Clip/Box" {
 	  _Metallic ("Metallic", Range(0,1)) = 0.0
 	  
     }
-    SubShader {
+    SubShader 
+    {
       Tags { "RenderType" = "Opaque" }
       Cull Off
       CGPROGRAM
@@ -51,7 +51,8 @@ Shader "Clip/Box" {
 	  // Use shader model 3.0 target, to get nicer looking lighting
 	  #pragma target 3.0
 		
-      struct Input {
+      struct Input 
+      {
           float2 uv_MainTex;
           float2 uv_Conversion;
           float2 uv_BumpMap;
@@ -71,16 +72,13 @@ Shader "Clip/Box" {
       sampler2D _BumpMap;
       sampler2D _Conversion;
       
-      void surf (Input IN, inout SurfaceOutputStandard o) {
+      void surf (Input IN, inout SurfaceOutputStandard o) 
+      {
 
-	      // Rodrigues' rotation formula uses radians
-		  // Vector3 newDir = Mathf.Cos(angle) * dir + Mathf.Sin(angle) * Vector3.Cross(axis, dir) + (1.0f - Mathf.Cos(angle)) * Vector3.Dot(axis,dir) * axis;
 
 	  	  float3 dir = IN.worldPos - _Origin;
-	  	  //dir = normalize(dir);
 	  	  float3 rads = float3(radians(_BoxRotation.x), radians(_BoxRotation.y), radians(_BoxRotation.z));
 
-		  // rotation euler order is z, x, then y like roll, pitch, and yaw
 	  	  // z
 	  	  dir = cos(rads.z) * dir + sin(rads.z) * cross(float3(0,0,1.0f), dir) + (1.0f - cos(rads.z)) * dot(float3(0,0,1.0f), dir) * float3(0,0,1.0f);
 		  // x
@@ -94,31 +92,17 @@ Shader "Clip/Box" {
 	      	  abs(dir.y), // no negatives
 	      	  abs(dir.z)  // no negatives
       	  );
-
-          // not good to use if statements in shaders, not sure about this EDIT: don't use this either
-//        clip( 
-//	      	(dist.x - _BoxSize.x * 0.5 < 0) &&
-//	      	(dist.y - _BoxSize.y * 0.5 < 0) &&
-//	      	(dist.z - _BoxSize.z * 0.5 < 0)
-//        ? -1:1);
- 		  // replaced
-
+          
 		  dist.x = dist.x - _BoxSize.x * 0.5;
 		  dist.y = dist.y - _BoxSize.y * 0.5;
 		  dist.z = dist.z - _BoxSize.z * 0.5;
 
-      	  // all need to be less than size
-      	  half t = min(1, dist.x); // if greater than zero don't clip
+      	  half t = min(1, dist.x); 
       	  t = max(t, dist.y);
       	  t = max(t, dist.z);
-
-
+          
       	  clip(-1*t);
-      	  //clip(-1*(step(dist.x,0) && step(dist.y,0) && step(dist.z,0)));
-
-      	  //clip(t);
-
-          // min = 0 // value = dist // max = _ConvertDistance
+          
           float convert_mask = max(dist.x,max(dist.y, dist.z)) / _ConvertDistance;
 		  convert_mask = clamp(convert_mask, 0, 1);
           
