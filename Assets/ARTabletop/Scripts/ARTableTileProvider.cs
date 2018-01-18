@@ -1,13 +1,14 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System.Linq;
-	using UnityEngine;
-	using Mapbox.Map;
+﻿using System.Linq;
+using UnityEngine;
+using Mapbox.Map;
 
+namespace Mapbox.Unity.Map
+{
+    
 	public class ARTableTileProvider : AbstractTileProvider
 	{
-        
-		[SerializeField]
+
+        [SerializeField]
         private AbstractMap _basicMap;
 
 		[SerializeField]
@@ -22,6 +23,7 @@
 		private bool _initialized = false;
 		private UnwrappedTileId _currentTile;
 		private UnwrappedTileId _cachedTile;
+
 
 		public override void OnInitialized()
 		{
