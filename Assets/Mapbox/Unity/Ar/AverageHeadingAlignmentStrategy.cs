@@ -21,6 +21,18 @@ namespace Mapbox.Unity.Ar
 		Quaternion _targetRotation;
 		Vector3 _targetPosition;
 
+		public static float meanAngle(List<float> rotations)
+		{
+			float xValue = 0, yValue = 0;
+			foreach (var r in rotations)
+			{
+				xValue += Mathf.Cos(r * Mathf.Deg2Rad);
+				yValue += Mathf.Sin(r * Mathf.Deg2Rad);
+			}
+
+			return Mathf.Rad2Deg * Mathf.Atan2( yValue / rotations.Count, xValue / rotations.Count);
+		}
+
 		public override void OnAlignmentAvailable(Alignment alignment)
 		{
 			var count = _rotations.Count;
@@ -38,14 +50,7 @@ namespace Mapbox.Unity.Ar
 			}
 
 			_rotations.Add(rotation);
-
-			var total = 0f;
-			foreach (var r in _rotations)
-			{
-				total += r;
-			}
-
-			_averageRotation = total / _rotations.Count;
+			_averageRotation = meanAngle(_rotations);
 
 			if (Mathf.Abs(Mathf.DeltaAngle(rotation, _averageRotation)) < _ignoreAngleThreshold)
 			{
@@ -61,7 +66,7 @@ namespace Mapbox.Unity.Ar
 			}
 			else
 			{
-				Console.Instance.Log("Ignoring alignment (^) due to poor angle!", "red");
+				Console.Instance.Log("Ignoring alignment (^) due to poor angle (Alignment rotation: "+rotation+", _averageRotation: "+_averageRotation+ "("+(_averageRotation+360)+"), _ignoreAngleThreshold: " + _ignoreAngleThreshold + ")", "red");
 			}
 		}
 
