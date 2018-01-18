@@ -15,7 +15,7 @@ namespace Mapbox.Unity.Ar
 
 
 		[Test]
-		public void meanAngleOver360()
+		public void MeanAngleOver360()
 		{
 			List<float> rotations = new List<float>();
 			rotations.Add(10);
@@ -27,7 +27,7 @@ namespace Mapbox.Unity.Ar
 
 
 		[Test]
-		public void meanAngleOver360Negative()
+		public void MeanAngleOver360Negative()
 		{
 			List<float> rotations = new List<float>();
 			rotations.Add(-10);
@@ -39,7 +39,7 @@ namespace Mapbox.Unity.Ar
 
 
 		[Test]
-		public void meanAngleAllPositive()
+		public void MeanAngleAllPositive()
 		{
 			List<float> rotations = new List<float>();
 			rotations.Add(10);
@@ -65,7 +65,7 @@ namespace Mapbox.Unity.Ar
 
 
 		[Test]
-		public void meanAngleSameAngleDifferentForms()
+		public void MeanAngleSameAngleDifferentForms()
 		{
 			List<float> rotations = new List<float>();
 			rotations.Add(270);
@@ -78,7 +78,7 @@ namespace Mapbox.Unity.Ar
 
 
 		[Test]
-		public void meanAnglePositiveAndNegative()
+		public void MeanAnglePositiveAndNegative()
 		{
 			List<float> rotations = new List<float>();
 			rotations.Add(-80);
@@ -94,7 +94,7 @@ namespace Mapbox.Unity.Ar
 		[Test]
 		// For consistency, angles returned are always within (-180, 180].
 		// Maybe counterintuitive if inputs were > 180, so this test is here to highlight this behaviour.
-		public void meanAngleWithin180OfZero()
+		public void MeanAngleWithin180OfZero()
 		{
 			List<float> rotations = new List<float>();
 			rotations.Add(270);
@@ -107,7 +107,7 @@ namespace Mapbox.Unity.Ar
 
 		[Test]
 		//Test to check we avoid the common (wrong) "solution": (sum(angles)%360) / count(angles)
-		public void meanAngleFiveNinetys()
+		public void MeanAngleFiveNinetys()
 		{
 			List<float> rotations = new List<float>();
 			rotations.Add(90);
