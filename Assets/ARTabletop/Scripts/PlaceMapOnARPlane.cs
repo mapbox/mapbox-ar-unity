@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 using UnityARInterface;
 
-public class PlaceMapOnARPlane : MonoBehaviour 
+public class PlaceMapOnARPlane : MonoBehaviour
 {
-    
+
     [SerializeField]
     private Transform _mapTransform;
 
-    void Start ()
+    void Start()
     {
         ARPlaneHandler.returnARPlane += PlaceMap;
         ARPlaneHandler.resetARPlane += ResetPlane;
@@ -15,7 +15,7 @@ public class PlaceMapOnARPlane : MonoBehaviour
 
     void PlaceMap(BoundedPlane plane)
     {
-        if(!_mapTransform.gameObject.activeSelf)
+        if (!_mapTransform.gameObject.activeSelf)
         {
             _mapTransform.gameObject.SetActive(true);
         }

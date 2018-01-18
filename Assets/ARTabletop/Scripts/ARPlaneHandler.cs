@@ -18,13 +18,13 @@ namespace UnityARInterface
 
         void UpdateARPlane(BoundedPlane arPlane)
         {
-            
-            if(_planeId == null)
+
+            if (_planeId == null)
             {
                 _planeId = arPlane.id;
             }
 
-            if(arPlane.id == _planeId) 
+            if (arPlane.id == _planeId)
             {
                 _cachedARPlane = arPlane;
             }
