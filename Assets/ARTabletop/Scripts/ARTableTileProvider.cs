@@ -3,9 +3,6 @@
 	using System.Linq;
 	using UnityEngine;
 	using Mapbox.Map;
-	using Mapbox.Utils;
-	using Mapbox.Unity.Utilities;
-    using System.Collections.Generic;
 
 	public class ARTableTileProvider : AbstractTileProvider
 	{
@@ -26,7 +23,6 @@
 		private UnwrappedTileId _currentTile;
 		private UnwrappedTileId _cachedTile;
 
-
 		public override void OnInitialized()
 		{
 			if (_targetTransform == null)
@@ -39,7 +35,6 @@
                 _initialized = true;
                 
 			}
-
 		}
 
 		private void Update()

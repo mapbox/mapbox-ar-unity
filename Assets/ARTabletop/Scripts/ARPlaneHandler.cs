@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 
 namespace UnityARInterface
@@ -18,7 +16,6 @@ namespace UnityARInterface
             ARInterface.planeUpdated += UpdateARPlane;
         }
 
-
         void UpdateARPlane(BoundedPlane arPlane)
         {
             
@@ -33,7 +30,6 @@ namespace UnityARInterface
             }
 
             returnARPlane(_cachedARPlane);
-
         }
     }
 }

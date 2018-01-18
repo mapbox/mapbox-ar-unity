@@ -75,7 +75,6 @@ Shader "Clip/Box"
       void surf (Input IN, inout SurfaceOutputStandard o) 
       {
 
-
 	  	  float3 dir = IN.worldPos - _Origin;
 	  	  float3 rads = float3(radians(_BoxRotation.x), radians(_BoxRotation.y), radians(_BoxRotation.z));
 
@@ -85,7 +84,6 @@ Shader "Clip/Box"
 		  dir = cos(rads.x) * dir + sin(rads.x) * cross(float3(1.0f,0,0), dir) + (1.0f - cos(rads.x)) * dot(float3(1.0f,0,0), dir) * float3(1.0f,0,0);
 		  // y
 		  dir = cos(rads.y) * dir + sin(rads.y) * cross(float3(0,1.0f,0), dir) + (1.0f - cos(rads.y)) * dot(float3(0,1.0f,0), dir) * float3(0,1.0f,0);
-		  
 
       	  half3 dist = half3(
 	      	  abs(dir.x), // no negatives
@@ -118,9 +116,10 @@ Shader "Clip/Box"
           o.Metallic = _Metallic;
 		  o.Smoothness = _Glossiness;
 		  o.Alpha = albedo.a + convert.a;
-          
-      }
+
+          }
+
       ENDCG
-    } 
+      }
     Fallback "Diffuse"
-  }
+    }

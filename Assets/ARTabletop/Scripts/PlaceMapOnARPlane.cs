@@ -1,16 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityARInterface;
 
 public class PlaceMapOnARPlane : MonoBehaviour 
 {
-
+    
     [SerializeField]
     private Transform _mapTransform;
 
-	// Use this for initialization
-	void Start () 
+    void Start ()
     {
         ARPlaneHandler.returnARPlane += PlaceMap;
         ARPlaneHandler.resetARPlane += ResetPlane;
@@ -22,6 +19,7 @@ public class PlaceMapOnARPlane : MonoBehaviour
         {
             _mapTransform.gameObject.SetActive(true);
         }
+
         _mapTransform.position = plane.center;
     }
 
