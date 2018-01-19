@@ -4,32 +4,32 @@ using UnityARInterface;
 public class PlaceMapOnARPlane : MonoBehaviour
 {
 
-    [SerializeField]
-    private Transform _mapTransform;
+	[SerializeField]
+	private Transform _mapTransform;
 
-    void Start()
-    {
-        ARPlaneHandler.returnARPlane += PlaceMap;
-        ARPlaneHandler.resetARPlane += ResetPlane;
-    }
+	void Start()
+	{
+		ARPlaneHandler.returnARPlane += PlaceMap;
+		ARPlaneHandler.resetARPlane += ResetPlane;
+	}
 
-    void PlaceMap(BoundedPlane plane)
-    {
-        if (!_mapTransform.gameObject.activeSelf)
-        {
-            _mapTransform.gameObject.SetActive(true);
-        }
+	void PlaceMap(BoundedPlane plane)
+	{
+		if (!_mapTransform.gameObject.activeSelf)
+		{
+			_mapTransform.gameObject.SetActive(true);
+		}
 
-        _mapTransform.position = plane.center;
-    }
+		_mapTransform.position = plane.center;
+	}
 
-    void ResetPlane()
-    {
-        _mapTransform.gameObject.SetActive(false);
-    }
+	void ResetPlane()
+	{
+		_mapTransform.gameObject.SetActive(false);
+	}
 
-    private void OnDisable()
-    {
-        ARPlaneHandler.returnARPlane -= PlaceMap;
-    }
+	private void OnDisable()
+	{
+		ARPlaneHandler.returnARPlane -= PlaceMap;
+	}
 }
