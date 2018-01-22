@@ -163,10 +163,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				{
 					Assert.IsTrue(res.HasError);
 					// Attention: when using Fiddler to throttle requests message is "Failed to receive data"
-					Assert.IsTrue(
-						res.Exceptions[0].Message.Contains("destination host")
-						, string.Format("Exception message [{0}] does not contain 'destination host'", res.Exceptions[0].Message)
-					);
+					Assert.AreEqual("Cannot resolve destination host", res.Exceptions[0].Message);
 				},
 				_timeout
 			);

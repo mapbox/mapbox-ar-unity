@@ -8,9 +8,6 @@
 	using UnityEditor;
 	using System.Text;
 	using UnityEditor.Build;
-#if UNITY_2018_1_OR_NEWER
-	using UnityEditor.Build.Reporting;
-#endif
 
 	/// <summary>
 	/// Simple pre-build script to check for duplicate Android libraries
@@ -18,14 +15,9 @@
 	public class PreBuildChecksEditor : IPreprocessBuild
 	{
 		public int callbackOrder { get { return 0; } }
-#if UNITY_2018_1_OR_NEWER
-		public void OnPreprocessBuild(BuildReport report)
-		{
-			BuildTarget target = report.summary.platform;
-#else
 		public void OnPreprocessBuild(BuildTarget target, string path)
 		{
-#endif
+
 			if (BuildTarget.Android != target)
 			{
 				return;
