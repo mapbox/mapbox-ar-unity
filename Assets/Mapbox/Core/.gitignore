@@ -1,0 +1,12 @@
+# ignore everything
+/*
+
+# except:
+
+# mapbox-sdk-cs and friends
+!mapbox-sdk-cs/
+!cheap-ruler-cs/
+!probe-extractor-cs/
+
+!*.gitignore
+!/**/*.meta

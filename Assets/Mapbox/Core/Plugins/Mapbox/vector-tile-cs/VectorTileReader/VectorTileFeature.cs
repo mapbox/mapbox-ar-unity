@@ -103,14 +103,9 @@ namespace Mapbox.VectorTile
 						{
 							continue;
 						}
-						// one part might result in several geoms after clipping, eg 'u'-shape where the
-						// lower part is completely beyond the actual tile border but still within the buffer
-						foreach (var item in tmp)
-						{
-							// flip winding order of inner rings back
-							if (isInner) { item.Reverse(); }
-							newGeom.Add(item);
-						}
+						// flip winding order of inner rings back
+						if (isInner) { tmp[0].Reverse(); }
+						newGeom.Add(tmp[0]);
 					}
 					geom = newGeom;
 				}

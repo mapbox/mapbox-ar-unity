@@ -11,6 +11,7 @@ namespace Mapbox.Unity
 	using Mapbox.Map;
 	using Mapbox.MapMatching;
 	using Mapbox.Tokens;
+	using Mapbox.Platform.TilesetTileJSON;
 
 	/// <summary>
 	/// Object for retrieving an API token and making http requests.
@@ -44,8 +45,7 @@ namespace Mapbox.Unity
 
 		MapboxConfiguration _configuration;
 		/// <summary>
-		/// The Mapbox API access token. 
-		/// See <see href="https://www.mapbox.com/mapbox-unity-sdk/docs/01-mapbox-api-token.html">Mapbox API Congfiguration in Unity</see>.
+		/// The Mapbox API access token.
 		/// </summary>
 		public MapboxConfiguration Configuration
 		{
@@ -68,6 +68,7 @@ namespace Mapbox.Unity
 				{
 					throw new InvalidTokenException("No configuration file found! Configure your access token from the Mapbox > Settings menu.");
 				}
+
 			}
 
 			TokenValidator.Retrieve(configuration.AccessToken, (response) =>
@@ -235,6 +236,23 @@ namespace Mapbox.Unity
 					_tokenValidator = new MapboxTokenApi();
 				}
 				return _tokenValidator;
+			}
+		}
+
+
+		TileJSON _tileJson;
+		/// <summary>
+		/// Lazy TileJSON wrapper: https://www.mapbox.com/api-documentation/#retrieve-tilejson-metadata
+		/// </summary>
+		public TileJSON TileJSON
+		{
+			get
+			{
+				if (_tileJson == null)
+				{
+					_tileJson = new TileJSON(new FileSource(_configuration.AccessToken), _configuration.DefaultTimeout);
+				}
+				return _tileJson;
 			}
 		}
 

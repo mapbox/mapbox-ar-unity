@@ -43,13 +43,6 @@
 			}
 		}
 
-		// Added to support TouchCamera script. Not in standard mapbox-unity-sdk. 
-		public void SendLocationEvent()
-		{
-			SetLocation();
-			SendLocation(_currentLocation);
-		}
-
 		void OnValidate()
 		{
 			if (_sendEvent)
