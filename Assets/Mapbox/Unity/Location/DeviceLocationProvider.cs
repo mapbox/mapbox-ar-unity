@@ -52,7 +52,11 @@ namespace Mapbox.Unity.Location
 		IEnumerator PollLocationRoutine()
 		{
 #if UNITY_EDITOR
-			yield return new WaitWhile(() => !UnityEditor.EditorApplication.isRemoteConnected);
+			//yield return new WaitWhile(() => !UnityEditor.EditorApplication.isRemoteConnected);
+			while (!UnityEditor.EditorApplication.isRemoteConnected)
+			{
+				yield return null;
+			}
 #endif
 			if (!Input.location.isEnabledByUser)
 			{
@@ -104,6 +108,7 @@ namespace Mapbox.Unity.Location
 
 				var lastData = Input.location.lastData;
 				timestamp = lastData.timestamp;
+				//Unity.Utilities.Console.Instance.Log(string.Format("timestamp:{0} lastLocTimestamp:{1}", timestamp, _lastLocationTimestamp), "white");
 				if (Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
 				{
 					_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);

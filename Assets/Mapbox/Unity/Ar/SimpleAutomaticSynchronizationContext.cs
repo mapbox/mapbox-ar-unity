@@ -85,7 +85,7 @@
 				// Perhaps more drift, but also more stable?
 				if (_currentArVector.magnitude < MinimumDeltaDistance || _currentAbsoluteGpsVector.magnitude < MinimumDeltaDistance)
 				{
-					Unity.Utilities.Console.Instance.Log("Minimum movement not yet met (arDelta: "+ _currentArVector.magnitude + ", gpsDelta: "+ _currentAbsoluteGpsVector.magnitude + ")", "red");
+					Unity.Utilities.Console.Instance.Log("Minimum movement not yet met (arDelta: " + _currentArVector.magnitude + ", gpsDelta: " + _currentAbsoluteGpsVector.magnitude + ")", "red");
 					return;
 				}
 
@@ -132,18 +132,30 @@
 			_position = (delta * bias) + originOffset;
 
 #if UNITY_EDITOR
-			Debug.Log("AR Vector: " + _currentArVector);
-			Debug.Log("GPS Vector: " + _currentAbsoluteGpsVector);
-			Debug.Log("HEADING:" + rotation);
-			Debug.Log("Relative GPS Vector: " + relativeGpsVector);
-			Debug.Log("BIAS: " + bias);
-			Debug.Log("DISTANCE: " + deltaDistance);
-			Debug.Log("OFFSET: " + originOffset);
-			Debug.Log("BIASED DELTA: " + delta);
-			Debug.Log("OFFSET: " + _position);
+			Debug.LogFormat(
+				"AR Vector:{0} GPS Vector:{1} HEADING:{2} HDOP:{3} Relative GPS Vector:{4} BIAS:{5} DISTANCE:{6} OFFSET:{7} BIASED DELTA:{8} OFFSET:{8}"
+				, _currentArVector
+				, _currentAbsoluteGpsVector
+				, rotation
+				, accuracy
+				, relativeGpsVector
+				, bias
+				, deltaDistance
+				, originOffset
+				, delta
+				, _position
+			);
 #endif
-			Unity.Utilities.Console.Instance.Log(string.Format("Offset: {0},\tHeading: {1},\tDisance: {2},\tBias: {3}",
-															   _position, _rotation, deltaDistance, bias), "orange");
+			Unity.Utilities.Console.Instance.Log(
+				string.Format(
+					"Offset: {0},\tHeading: {1},\tDisance: {2},\tBias: {3}"
+					, _position
+					, _rotation
+					, deltaDistance
+					, bias
+				)
+				, "orange"
+			);
 
 			var alignment = new Alignment();
 			alignment.Rotation = _rotation;

@@ -49,7 +49,15 @@ namespace Mapbox.Unity.Ar
 				if (_locationProvider == null)
 				{
 #if UNITY_EDITOR
-					_locationProvider = LocationProviderFactory.Instance.TransformLocationProvider;
+					Debug.LogWarningFormat("SimpleAutomaticSynchronizationContextBehaviour, isRemoteConnected:{0}", UnityEditor.EditorApplication.isRemoteConnected);
+					if (!UnityEditor.EditorApplication.isRemoteConnected)
+					{
+						_locationProvider = LocationProviderFactory.Instance.TransformLocationProvider;
+					}
+					else
+					{
+						_locationProvider = LocationProviderFactory.Instance.DefaultLocationProvider;
+					}
 #else
 					_locationProvider = LocationProviderFactory.Instance.DefaultLocationProvider;
 #endif
@@ -104,7 +112,7 @@ namespace Mapbox.Unity.Ar
 		void PlaneAddedHandler(BoundedPlane plane)
 		{
 			_lastHeight = plane.center.y;
-			Unity.Utilities.Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
+			//Unity.Utilities.Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
 		}
 
 		//void UnityARSessionNativeInterface_ARSessionTrackingChanged(UnityEngine.XR.iOS.UnityARCamera camera)
@@ -116,7 +124,12 @@ namespace Mapbox.Unity.Ar
 		{
 			if (location.IsLocationUpdated)
 			{
-				if (location.Accuracy > _minimumDesiredAccuracy) //With this line, we can control accuracy of Gps updates. 
+				// With this line, we can control accuracy of Gps updates. 
+				// Be aware that we only get location information if it previously met
+				// the conditions of DeviceLocationProvider:
+				// * desired accuarracy in meters
+				// * and update distance in meters
+				if (location.Accuracy > _minimumDesiredAccuracy)
 				{
 					Unity.Utilities.Console.Instance.Log(
 						string.Format(
