@@ -1,7 +1,8 @@
 ﻿namespace Mapbox.Unity.Ar.Utilities
 {
 	using UnityEngine;
-	using UnityEngine.XR.iOS;
+	//using UnityEngine.XR.iOS;
+	using UnityARInterface;
 
 	[RequireComponent(typeof(LineRenderer))]
 	public class PlotRoute : MonoBehaviour
@@ -34,7 +35,7 @@
 		void Awake()
 		{
 			// HACK: this needs to move somewhere else (marshal).
-			UnityARSessionNativeInterface.ARAnchorAddedEvent += AddAnchor;
+			ARInterface.planeAdded += AddAnchor;
 
 			_lineRenderer = GetComponent<LineRenderer>();
 			_lineRenderer.startColor = _color;
@@ -43,9 +44,9 @@
 			_sqDistance = _minDistance * _minDistance;
 		}
 
-		void AddAnchor(ARPlaneAnchor anchorData)
+		void AddAnchor(BoundedPlane anchorData)
 		{
-			UnityARSessionNativeInterface.ARAnchorAddedEvent -= AddAnchor;
+			ARInterface.planeAdded -= AddAnchor;
 			_isStable = true;
 			AddNode(_target.localPosition);
 		}

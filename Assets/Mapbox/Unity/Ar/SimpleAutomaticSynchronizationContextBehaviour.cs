@@ -118,7 +118,14 @@ namespace Mapbox.Unity.Ar
 			{
 				if (location.Accuracy > _minimumDesiredAccuracy) //With this line, we can control accuracy of Gps updates. 
 				{
-					Unity.Utilities.Console.Instance.Log("Gps update ignored due to bad accuracy", "red");
+					Unity.Utilities.Console.Instance.Log(
+						string.Format(
+							"Gps update ignored due to bad accuracy: {0:0.0} > {1:0.0}"
+							, location.Accuracy
+							, _minimumDesiredAccuracy
+						)
+						, "red"
+					);
 				}
 				else
 				{
