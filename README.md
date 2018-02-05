@@ -42,7 +42,7 @@ For additional inspiration and reference, please [see this library for iOS](http
 - Debug utilities
 - [Unity ARInterface](https://github.com/Unity-Technologies/experimental-ARInterface)
   - Unity ARKit plugin
-  - Google ARCore plugin
+  - Google ARCore plugin Preview 2
   - ARInterface
 
 
@@ -52,14 +52,13 @@ For additional inspiration and reference, please [see this library for iOS](http
 - iOS 11.1+
 - Xcode 9.1+
 - iOS device that supports ARKit (iPhone 6S or later, iPad (2017) or later)
-- Android device that [supports ARCore](https://developers.google.com/ar/discover/) (Google Pixel, Pixel XL, Pixel 2, Pixel 2 XL, Samsung Galaxy S8)
+- Android device that [supports ARCore](https://developers.google.com/ar/discover/) (Google Pixel, Pixel XL, Pixel 2, Pixel 2 XL, Samsung Galaxy S8). Install the APK from here: https://github.com/google-ar/arcore-android-sdk/releases
 
 ## Known Issues
 
 - Location permissions on Android must be enabled manually after installing application! [See here for related information](https://github.com/google-ar/arcore-unity-sdk/issues/14#issuecomment-330403879).
-- Debug paths are not rendering on Android
 - AR Tracking state is not yet exposed in the ARInterface
-- Focus square has rendering issues on Android
+- Focus square has rendering issues on iOS and Android
 
 ## Usage
 

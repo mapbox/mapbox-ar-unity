@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -25,22 +26,37 @@ namespace UnityARInterface
         private Vector3[] m_PointCloudData;
         private LightEstimate m_LightEstimate;
 		private Matrix4x4 m_DisplayTransform;
+        private ARKitWorldTrackingSessionConfiguration m_SessionConfig;
+
+        public override bool IsSupported
+        {
+            get
+            {
+                return m_SessionConfig.IsSupported;
+            }
+        }
 
         // Use this for initialization
-        public override bool StartService(Settings settings)
+        public override IEnumerator StartService(Settings settings)
         {
-            ARKitWorldTrackingSessionConfiguration sessionConfig = new ARKitWorldTrackingSessionConfiguration(
+            m_SessionConfig = new ARKitWorldTrackingSessionConfiguration(
                 UnityARAlignment.UnityARAlignmentGravity,
                 settings.enablePlaneDetection ? UnityARPlaneDetection.Horizontal : UnityARPlaneDetection.None,
                 settings.enablePointCloud,
                 settings.enableLightEstimation);
+
+            if (!IsSupported)
+            {
+                Debug.LogError("The requested ARKit session configuration is not supported");
+                return null;
+            }
 
             UnityARSessionRunOption runOptions =
                 UnityARSessionRunOption.ARSessionRunOptionRemoveExistingAnchors |
                 UnityARSessionRunOption.ARSessionRunOptionResetTracking;
 
             nativeInterface.RunWithConfigAndOptions(
-                sessionConfig, runOptions);
+                m_SessionConfig, runOptions);
 
             // Register for plane detection
             UnityARSessionNativeInterface.ARAnchorAddedEvent += AddAnchor;
@@ -48,7 +64,9 @@ namespace UnityARInterface
             UnityARSessionNativeInterface.ARAnchorRemovedEvent += RemoveAnchor;
             UnityARSessionNativeInterface.ARFrameUpdatedEvent += UpdateFrame;
 
-            return true;
+            IsRunning = true;
+
+            return null;
         }
 
         private Vector3 GetWorldPosition(ARPlaneAnchor arPlaneAnchor)
@@ -89,12 +107,12 @@ namespace UnityARInterface
 
             m_PointCloudData = camera.pointCloudData;
             m_LightEstimate.capabilities = LightEstimateCapabilities.AmbientColorTemperature | LightEstimateCapabilities.AmbientIntensity;
-            m_LightEstimate.ambientColorTemperature = camera.lightEstimation.ambientColorTemperature;
+			m_LightEstimate.ambientColorTemperature = camera.lightData.arLightEstimate.ambientColorTemperature;
 
             // Convert ARKit intensity to Unity intensity
             // ARKit ambient intensity ranges 0-2000
             // Unity ambient intensity ranges 0-8 (for over-bright lights)
-            m_LightEstimate.ambientIntensity = camera.lightEstimation.ambientIntensity / 1000f;
+			m_LightEstimate.ambientIntensity = camera.lightData.arLightEstimate.ambientIntensity / 1000f;
 
 			//get display transform matrix sent up from sdk
 			m_DisplayTransform.SetColumn(0, camera.displayTransform.column0);
@@ -140,7 +158,6 @@ namespace UnityARInterface
             OnPlaneUpdated(GetBoundedPlane(arPlaneAnchor));
         }
 
-        // Update is called once per frame
         public override void StopService()
         {
             UnityARSessionNativeInterface.GetARSessionNativeInterface().Pause();
@@ -149,6 +166,8 @@ namespace UnityARInterface
             m_PinnedYArray.Free();
             m_PinnedUVArray.Free();
             m_TexturesInitialized = false;
+
+            IsRunning = false;
         }
 
         public override bool TryGetUnscaledPose(ref Pose pose)
