@@ -1,8 +1,15 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: 93be2b9777c348648a2d9151b7e233fc
 folderAsset: yes
 timeCreated: 1501825151
 licenseType: Free
+=======
+guid: 509f35b960e1849d7954bfeff44872df
+folderAsset: yes
+timeCreated: 1513978397
+licenseType: Pro
+>>>>>>> tabletop
 DefaultImporter:
   externalObjects: {}
   userData: 
