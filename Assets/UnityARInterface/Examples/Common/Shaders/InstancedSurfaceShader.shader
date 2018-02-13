@@ -1,13 +1,5 @@
 ﻿// Upgrade NOTE: upgraded instancing buffer 'Props' to new syntax.
 
-<<<<<<< HEAD
-Shader "Custom/InstancedSurfaceShader" {
-	Properties {
-		_Color ("Color", Color) = (1,1,1,1)
-		_MainTex ("Albedo (RGB)", 2D) = "white" {}
-		_Glossiness ("Smoothness", Range(0,1)) = 0.5
-		_Metallic ("Metallic", Range(0,1)) = 0.0
-=======
 Shader "Custom/InstancedSurfaceShader" 
 {
 	Properties
@@ -16,7 +8,6 @@ Shader "Custom/InstancedSurfaceShader"
 		_MainTex("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness("Smoothness", Range(0,1)) = 0.5
 		_Metallic("Metallic", Range(0,1)) = 0.0
->>>>>>> tabletop
 	}
 	SubShader
 	{
@@ -45,25 +36,15 @@ Shader "Custom/InstancedSurfaceShader"
 		// See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
 		// #pragma instancing_options assumeuniformscaling
 		UNITY_INSTANCING_BUFFER_START(Props)
-<<<<<<< HEAD
-			// put more per-instance properties here
-			UNITY_DEFINE_INSTANCED_PROP (fixed4, _InstanceColor)
-#define _InstanceColor_arr Props
-=======
 		// put more per-instance properties here
 		UNITY_DEFINE_INSTANCED_PROP(fixed4, _InstanceColor)
 		#define _InstanceColor_arr Props
->>>>>>> tabletop
 		UNITY_INSTANCING_BUFFER_END(Props)
 
 		void surf(Input IN, inout SurfaceOutputStandard o) 
 		{
 			// Albedo comes from a texture tinted by color
-<<<<<<< HEAD
-			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * UNITY_ACCESS_INSTANCED_PROP (_InstanceColor_arr, _InstanceColor);
-=======
 			fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * UNITY_ACCESS_INSTANCED_PROP(_InstanceColor_arr, _InstanceColor);
->>>>>>> tabletop
 			o.Albedo = c.rgb;
 			// Metallic and smoothness come from slider variables
 			o.Metallic = _Metallic;
