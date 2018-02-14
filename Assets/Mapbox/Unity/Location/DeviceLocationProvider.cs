@@ -17,6 +17,7 @@ namespace Mapbox.Unity.Location
 		/// Values like 5-10 could be used for getting best accuracy.
 		/// </summary>
 		[SerializeField]
+		[Tooltip("Using higher value like 500 usually does not require to turn GPS chip on and thus saves battery power. Values like 5-10 could be used for getting best accuracy.")]
 		float _desiredAccuracyInMeters = 5f;
 
 		/// <summary>
@@ -24,6 +25,7 @@ namespace Mapbox.Unity.Location
 		/// Higher values like 500 imply less overhead.
 		/// </summary>
 		[SerializeField]
+		[Tooltip("The minimum distance (measured in meters) a device must move laterally before Input.location property is updated. Higher values like 500 imply less overhead.")]
 		float _updateDistanceInMeters = 5f;
 
 		Coroutine _pollRoutine;
@@ -124,7 +126,8 @@ namespace Mapbox.Unity.Location
 					SendLocation(_currentLocation);
 				}
 
-				yield return null;
+				//yield return null;
+				yield return _wait;
 			}
 		}
 	}

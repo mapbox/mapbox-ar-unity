@@ -34,6 +34,7 @@
 		/// 0 represents full trust in AR, but no trust in GPS.
 		/// 1 represents full trust in GPS position, but no trust in AR.
 		/// </summary>
+		[Tooltip("The synchronization bias. 0 represents full trust in AR, but no trust in GPS. 1 represents full trust in GPS position, but no trust in AR.")]
 		public float SynchronizationBias = 1f;
 
 		/// <summary>
@@ -41,12 +42,14 @@
 		/// must differ before new nodes can be added.
 		/// This is to prevent micromovements in AR from being registered if GPS updates wildly for some reason.
 		/// </summary>
+		[Tooltip("The minimum distance that BOTH gps and ar delta vectors (since last nodes added) must differ before new nodes can be added. This is to prevent micromovements in AR from being registered if GPS updates wildly for some reason.")]
 		public float MinimumDeltaDistance;
 
 		/// <summary>
 		/// Use automatic synchronization bias.
 		/// This will use ArTrustRange and Location Accuracy to determine bias.
 		/// </summary>
+		[Tooltip("Use automatic synchronization bias. This will use ArTrustRange and Location Accuracy to determine bias.")]
 		public bool UseAutomaticSynchronizationBias;
 
 		/// <summary>
@@ -54,6 +57,7 @@
 		/// AR is great for local position changes, but poor over great distance.
 		/// As a node approaches the radius, GPS will generally be favored (assuming location accuracy is high).
 		/// </summary>
+		[Tooltip("The AR trust radius. Essentially, this is how far we will trust AR to report accurate postions. AR is great for local position changes, but poor over great distance. As a node approaches the radius, GPS will generally be favored (assuming location accuracy is high).")]
 		public float ArTrustRange;
 
 		/// <summary>
