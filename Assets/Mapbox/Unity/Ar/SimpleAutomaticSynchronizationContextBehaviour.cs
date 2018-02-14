@@ -128,8 +128,8 @@ namespace Mapbox.Unity.Ar
 				, location.Timestamp
 				, location.IsLocationUpdated
 				, location.IsHeadingUpdated
-				, location.Heading
 				, location.Accuracy
+				, location.Heading
 				, location.LatitudeLongitude.x
 				, location.LatitudeLongitude.y
 			);
@@ -168,6 +168,18 @@ namespace Mapbox.Unity.Ar
 
 					var position = Conversions.GeoToWorldPosition(latitudeLongitude, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz();
 					_synchronizationContext.AddSynchronizationNodes(location, position, _arPositionReference.localPosition);
+
+					string positionLog = string.Format(
+						"location:{1}{0}latlng:{2}{0}centerMerc:{3}{0}relScale:{4}{0}pos:{5}{0}arPosRef:{6}"
+						, Environment.NewLine
+						, location.IsLocationUpdated
+						, latitudeLongitude
+						, _map.CenterMercator
+						, _map.WorldRelativeScale
+						, position
+						, _arPositionReference.localPosition
+					);
+					Unity.Utilities.Console.Instance.LogPosition(positionLog);
 				}
 
 
