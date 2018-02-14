@@ -15,6 +15,9 @@ namespace Mapbox.Unity.Utilities
 		Text _logText;
 
 		[SerializeField]
+		Text _logGps;
+
+		[SerializeField]
 		ScrollRect _logScroll;
 
 		static Console _instance;
@@ -49,6 +52,11 @@ namespace Mapbox.Unity.Utilities
 			_log += string.Format("<color={0}>{1}</color>\n", color, log);
 			_logText.text = _log;
 			_logScroll.verticalNormalizedPosition = 0f;
+		}
+
+		public void LogGps(string log)
+		{
+			_logGps.text = log;
 		}
 
 

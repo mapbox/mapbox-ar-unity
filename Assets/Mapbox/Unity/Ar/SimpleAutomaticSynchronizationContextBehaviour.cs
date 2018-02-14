@@ -122,6 +122,19 @@ namespace Mapbox.Unity.Ar
 
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
+			string gpsLog = string.Format(
+				"{1}{0}locUpd:{2} hdUpd:{3}{0}acc:{4:0.0} hd:{5:0.0}{0}{6:0.00000} / {7:0.00000}"
+				, Environment.NewLine
+				, location.Timestamp
+				, location.IsLocationUpdated
+				, location.IsHeadingUpdated
+				, location.Heading
+				, location.Accuracy
+				, location.LatitudeLongitude.x
+				, location.LatitudeLongitude.y
+			);
+			Unity.Utilities.Console.Instance.LogGps(gpsLog);
+
 			if (location.IsLocationUpdated)
 			{
 				// With this line, we can control accuracy of Gps updates. 
