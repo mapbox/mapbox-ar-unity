@@ -389,22 +389,22 @@ Prefab:
     - target: {fileID: 114020511733235004, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _minimumDesiredAccuracy
-      value: 5000
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 114020511733235004, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _minimumDeltaDistance
-      value: 0.1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114182007959914852, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _desiredAccuracyInMeters
-      value: 5000
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 114182007959914852, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _updateDistanceInMeters
-      value: 0
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 114589138177000676, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
@@ -454,12 +454,12 @@ Prefab:
     - target: {fileID: 114979273059922282, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _maxSamples
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 114979273059922282, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _ignoreAngleThreshold
-      value: 20
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 114450784373331000, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
@@ -471,9 +471,25 @@ Prefab:
       propertyPath: _arTrustRange
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 114979273059922282, guid: 35e76f6e52f5c4252a0b703cc2019a37,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114020511733235004, guid: 35e76f6e52f5c4252a0b703cc2019a37,
+        type: 2}
+      propertyPath: _alignmentStrategy
+      value: 
+      objectReference: {fileID: 1002213153}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 35e76f6e52f5c4252a0b703cc2019a37, type: 2}
   m_IsPrefabParent: 0
+--- !u!114 &1002213153 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114979273059922282, guid: 35e76f6e52f5c4252a0b703cc2019a37,
+    type: 2}
+  m_PrefabInternal: {fileID: 1002213147}
+  m_Script: {fileID: 11500000, guid: b000a4c373a2e470986a96ce9dba73ed, type: 3}
 --- !u!114 &1313045318 stripped
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 114182007959914852, guid: 35e76f6e52f5c4252a0b703cc2019a37,
