@@ -34,11 +34,11 @@ namespace Mapbox.Unity.Location
 
 		double _lastHeadingTimestamp;
 
-		WaitForSeconds _wait;
+		WaitForSeconds _wait1sec;
 
 		void Awake()
 		{
-			_wait = new WaitForSeconds(1f);
+			_wait1sec = new WaitForSeconds(1f);
 			if (_pollRoutine == null)
 			{
 				_pollRoutine = StartCoroutine(PollLocationRoutine());
@@ -54,7 +54,6 @@ namespace Mapbox.Unity.Location
 		IEnumerator PollLocationRoutine()
 		{
 #if UNITY_EDITOR
-			//yield return new WaitWhile(() => !UnityEditor.EditorApplication.isRemoteConnected);
 			while (!UnityEditor.EditorApplication.isRemoteConnected)
 			{
 				yield return null;
@@ -72,7 +71,7 @@ namespace Mapbox.Unity.Location
 			int maxWait = 20;
 			while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
 			{
-				yield return _wait;
+				yield return _wait1sec;
 				maxWait--;
 			}
 
@@ -91,7 +90,7 @@ namespace Mapbox.Unity.Location
 #if UNITY_EDITOR
 			// HACK: this is to prevent Android devices, connected through Unity Remote, 
 			// from reporting a location of (0, 0), initially.
-			yield return _wait;
+			yield return _wait1sec;
 #endif
 			while (true)
 			{
@@ -110,7 +109,7 @@ namespace Mapbox.Unity.Location
 
 				var lastData = Input.location.lastData;
 				timestamp = lastData.timestamp;
-				//Unity.Utilities.Console.Instance.Log(string.Format("timestamp:{0} lastLocTimestamp:{1}", timestamp, _lastLocationTimestamp), "white");
+
 				if (Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
 				{
 					_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
@@ -126,8 +125,9 @@ namespace Mapbox.Unity.Location
 					SendLocation(_currentLocation);
 				}
 
-				//yield return null;
-				yield return _wait;
+				// throttle pulling location data
+				// some Android devices show higher than actual accuracy values when not throttling
+				yield return _wait1sec;
 			}
 		}
 	}
