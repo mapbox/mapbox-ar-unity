@@ -38,6 +38,10 @@ namespace Mapbox.Unity.Ar
 		float _lastHeading;
 		float _lastHeight;
 
+		// TODO: move to "base" class SimpleAutomaticSynchronizationContext
+		// keep it here for now as map position is also calculated here
+		private KalmanLatLong _kalman = new KalmanLatLong(3); // very fast walking
+
 		ILocationProvider _locationProvider;
 
 		public event Action<Alignment> OnAlignmentAvailable = delegate { };
@@ -155,6 +159,16 @@ namespace Mapbox.Unity.Ar
 				}
 				else
 				{
+					_kalman.Process(
+						location.LatitudeLongitude.x
+						, location.LatitudeLongitude.y
+						, location.Accuracy
+						, (long)location.Timestamp
+					);
+					location.LatitudeLongitude.x = _kalman.Lat;
+					location.LatitudeLongitude.y = _kalman.Lng;
+					location.Accuracy = (int)_kalman.Accuracy;
+
 					var latitudeLongitude = location.LatitudeLongitude;
 					Unity.Utilities.Console.Instance.Log(
 						string.Format(
