@@ -92,6 +92,11 @@ namespace Mapbox.Unity.Location
 			// from reporting a location of (0, 0), initially.
 			yield return _wait1sec;
 #endif
+
+			float gpsInitializedTime = Time.realtimeSinceStartup;
+			// initially pass through all GPS locations
+			float gpsWarmupTime = 60f;
+
 			while (true)
 			{
 				_currentLocation.IsHeadingUpdated = false;
@@ -102,6 +107,8 @@ namespace Mapbox.Unity.Location
 				{
 					var heading = Input.compass.trueHeading;
 					_currentLocation.Heading = heading;
+					_currentLocation.HeadingMagnetic = Input.compass.magneticHeading;
+					_currentLocation.HeadingAccuracy = Input.compass.headingAccuracy;
 					_lastHeadingTimestamp = timestamp;
 
 					_currentLocation.IsHeadingUpdated = true;
@@ -110,7 +117,10 @@ namespace Mapbox.Unity.Location
 				var lastData = Input.location.lastData;
 				timestamp = lastData.timestamp;
 
-				if (Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
+				if (1!=2 ||
+					(Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
+					|| Time.realtimeSinceStartup < gpsInitializedTime + gpsWarmupTime
+				)
 				{
 					_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
 					_currentLocation.Accuracy = (int)lastData.horizontalAccuracy;

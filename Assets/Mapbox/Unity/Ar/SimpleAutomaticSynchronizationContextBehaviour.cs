@@ -127,13 +127,15 @@ namespace Mapbox.Unity.Ar
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
 			string gpsLog = string.Format(
-				"{1}{0}locUpd:{2} hdUpd:{3}{0}acc:{4:0.0} hd:{5:0.0}{0}{6:0.00000} / {7:0.00000}"
+				"{1} locationUpdated:{2} headingUpdated:{3}{0}GPS accuracy:{4:0.0}{0}heading(truenorth):{5:0.0}{0}heading(magnetic):{6:0.0}{0}heading accuracy:{7:0.0}{0}{8:0.00000} / {9:0.00000}"
 				, Environment.NewLine
 				, location.Timestamp
 				, location.IsLocationUpdated
 				, location.IsHeadingUpdated
 				, location.Accuracy
 				, location.Heading
+				, location.HeadingMagnetic
+				, location.HeadingAccuracy
 				, location.LatitudeLongitude.x
 				, location.LatitudeLongitude.y
 			);
