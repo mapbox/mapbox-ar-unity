@@ -1,4 +1,12 @@
 
+# THIS REPOSITORY IS DEPREACTED!
+
+AR support been merged into the main repository https://github.com/mapbox/mapbox-unity-sdk/
+
+Please open issues or PRs there!
+
+-----
+
 ![unity-repo-banner_preview](https://user-images.githubusercontent.com/4824060/34123144-9a78d322-e3fc-11e7-936f-d5e526ca8520.png)
 
 
